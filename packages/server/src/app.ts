@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import { port as serverPort } from './config';
 import router from './controllers/router';
+import { handleDisconnect } from './controllers/database.controller';
 
 const app: express.Application = express();
 const port = serverPort;
