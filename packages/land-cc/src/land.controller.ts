@@ -9,6 +9,8 @@ import {
 } from '@worldsibu/convector-core';
 
 import { Land } from './land.model';
+import { RLR } from './rlr.model';
+import { Notary } from './notary.model';
 
 @Controller('land')
 export class LandController extends ConvectorController<ChaincodeTx> {
@@ -92,6 +94,60 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     let mockData = [land1, land2, land3, land4, land5, land6];
     await Promise.all(mockData.map(land => land.save()));
     return "mock data successfully initialized";
+  }
+
+  // Register RLR
+  @Invokable()
+  public async registerRLR(
+    @Param(yup.string()) id: string,
+    @Param(yup.string()) name: string
+  ) {
+    if(!this.checkOrgPriviledges('rlr')) {
+      throw new Error('User has no priviledges to execute this action');
+    }
+    // Retrieve to see if exists
+    const existing = await RLR.getOne(id);
+
+    if (!existing || !existing.id) {
+      let rlr = new RLR();
+      rlr.id = id;
+      rlr.name = name;
+      rlr.fingerprint = this.sender;
+      rlr.active_status = true;
+
+      await rlr.save();
+    } else {
+      throw new Error('Error : Identity exists already');
+    }
+  }
+
+  // Register Notary
+  @Invokable()
+  public async registerNotary(
+    @Param(yup.string()) id: string,
+    @Param(yup.string()) fullname: string,
+    @Param(yup.string()) nic: string,
+    @Param(yup.string()) registered_rlr_id: string,
+  ) {
+    if(!this.checkOrgPriviledges('notary')) {
+      throw new Error('User has no priviledges to execute this action');
+    }
+    // Retrieve to see if exists
+    const existing = await Notary.getOne(id);
+
+    if (!existing || !existing.id) {
+      let notary = new Notary();
+      notary.id = id;
+      notary.fullname = fullname;
+      notary.nic = nic;
+      notary.registered_rlr_id = registered_rlr_id;
+      notary.fingerprint = this.sender;
+      notary.active_status = true;
+
+      await notary.save();
+    } else {
+      throw new Error('Error : Identity exists already');
+    }
   }
 
   // Get land information by ID
@@ -188,5 +244,17 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     } else {
       throw new Error("Authorization failed");
     }
+  }
+
+  private checkOrgPriviledges(org: string) {
+    if(org == 'rlr') {
+      return this.tx.identity.getMSPID() === 'org1MSP';
+    } 
+    if(org == 'surveyor') {
+      return this.tx.identity.getMSPID() === 'org2MSP';
+    }
+    if(org == 'notary') {
+      return this.tx.identity.getMSPID() === 'org3MSP';
+    } 
   }
 }

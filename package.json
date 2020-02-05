@@ -12,7 +12,7 @@
     "test:e2e": "npm-run-all -s lerna:test:e2e",
     "env:clean": "hurl clean",
     "cc:start": "f() { npm run cc:package -- $1; npm run cc:install $1 $2; }; f",
-    "cc:upgrade": "f() { npm run cc:package -- $1; hurl upgrade ${2:-$1} node $2 -o org1 -o org2 -o org3 -P ./chaincode-$1; }; f",
+    "cc:upgrade": "f() { npm run cc:package -- $1; hurl upgrade $1 node $2 -o org1 -o org2 -o org3 -P ./chaincode-$1; }; f",
     "cc:start:debug": "f() { npm run cc:package -- $1; npm run cc:install:debug $1 $2; }; f",
     "===================INTERNALS===================": "===================NO NEED TO CALL THEM DIRECTLY===================",
     "lerna:install": "lerna bootstrap",
