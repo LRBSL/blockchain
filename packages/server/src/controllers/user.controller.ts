@@ -5,7 +5,7 @@ import { ClientFactory } from '@worldsibu/convector-core';
 import * as Fabric_Client from 'fabric-client';
 import * as Fabric_CA_Client from 'fabric-ca-client';
 import { LandController } from 'land-cc';
-import { getAuthUser, setAuthUser, deleteAuthUser } from './database.controller';
+import { getAuthUser, setAuthUser, deleteAuthUser, generateAuthUserIdentityName } from './database.controller';
 import { checkBodyParams, checkAdminPriviledges } from './utils';
 
 const fabric_client = new Fabric_Client();
@@ -13,7 +13,7 @@ let fabric_ca_client = null;
 let admin_user = null;
 let member_user = null;
 
-const homedir = require('os').homedir();
+// const homedir = require('os').homedir();
 
 // user login function
 // @body username, passwd
@@ -41,7 +41,7 @@ export async function LandController_login_post(req: Request, res: Response) {
             // optional
             initServerIdentity().then(() => {
                 checkCryptographicMaterials().then(() => {
-                    res.send(JSON.stringify(curUser.username + " successfully logged"));
+                    res.status(200).send(JSON.stringify(curUser.username + " successfully logged"));
                 });
             });
         } else {
@@ -54,17 +54,23 @@ export async function LandController_login_post(req: Request, res: Response) {
 }
 
 // user register function
-// @body userId
+// @body username, passwd
 export async function LandController_register_post(req: Request, res: Response): Promise<void> {
     try {
         let params = req.body;
-        checkBodyParams([params.userId, params.username, params.passwd]);
+        let userId: string;
+        checkBodyParams([params.username, params.passwd]);
         checkAdminPriviledges();
+        generateAuthUserIdentityName(identity_config.identityOrg).then((result:string) => {
+            userId = result;
+        }).catch((err) => {
+            throw new Error("Error occured in new user identity name generating process.")
+        })
 
         setAuthUser({
             username: params.username,
             passwd: params.passwd,
-            identityName: params.userId,
+            identityName: userId,
             identityOrg: identity_config.identityOrg
         }).then((result) => {
             Fabric_Client.newDefaultKeyValueStore({
@@ -91,9 +97,9 @@ export async function LandController_register_post(req: Request, res: Response):
                 // at this point we should have the admin user
                 // first need to register the user with the CA server
                 return fabric_ca_client.register({
-                    enrollmentID: params.userId,
+                    enrollmentID: userId,
                     attrs: [{
-                        name: params.userId,
+                        name: userId,
                         value: 'true',
                         ecert: true
                     }],
@@ -101,15 +107,15 @@ export async function LandController_register_post(req: Request, res: Response):
                 }, admin_user);
             }).then((secret) => {
                 // next we need to enroll the user with CA server
-                console.log('Successfully registered ' + params.userId + ' - secret:' + secret);
+                console.log('Successfully registered ' + userId + ' - secret:' + secret);
                 return fabric_ca_client.enroll({
-                    enrollmentID: params.userId,
+                    enrollmentID: userId,
                     enrollmentSecret: secret
                 });
             }).then((enrollment) => {
-                console.log('Successfully enrolled member user ' + params.userId);
+                console.log('Successfully enrolled member user ' + userId);
                 return fabric_client.createUser({
-                    username: params.userId,
+                    username: userId,
                     mspid: admin_user.getIdentity().getMSPId(),
                     cryptoContent: {
                         privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate
@@ -120,8 +126,8 @@ export async function LandController_register_post(req: Request, res: Response):
                 member_user = user;
                 return fabric_client.setUserContext(member_user);
             }).then(() => {
-                console.log(params.userId + ' was successfully registered and enrolled and is ready to interact with the fabric network');
-                res.send(JSON.stringify(params.userId + ' was successfully registered and enrolled'));
+                console.log(userId + ' was successfully registered and enrolled and is ready to interact with the fabric network');
+                res.send(JSON.stringify(userId + ' was successfully registered and enrolled'));
             }).catch((err) => {
                 console.error('Failed to register: ' + err);
                 if (err.toString().indexOf('Authorization') > -1) {

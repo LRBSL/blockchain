@@ -25,7 +25,7 @@ export function handleDisconnect() {
     });
 }
 
-// getting authentication user data
+// get authentication user data
 export async function getAuthUser(username: string, passwd: string) {
     let promise = new Promise((resolve, reject) => {
         handleDisconnect();
@@ -35,6 +35,25 @@ export async function getAuthUser(username: string, passwd: string) {
                 reject(err);
             } else {
                 resolve(resultUser[0]);
+            }
+        });
+        connection.end();
+    });
+    return promise;
+}
+
+// generate authentication user identity name
+export async function generateAuthUserIdentityName(identityOrg: string) {
+    let promise = new Promise((resolve, reject) => {
+        handleDisconnect();
+        var query = "SELECT identityName FROM users WHERE identityOrg LIKE '" + identityOrg + "' ORDER BY identityName DESC LIMIT 1";
+        connection.query(query, function (err, resultUser) {
+            if (err || resultUser.length == 0) {
+                reject(err);
+            } else {
+                let userIdentityName: string = resultUser[0].identityName;
+                userIdentityName = "user" + (parseInt(userIdentityName.substr(4)) + 1);
+                resolve(userIdentityName);
             }
         });
         connection.end();
