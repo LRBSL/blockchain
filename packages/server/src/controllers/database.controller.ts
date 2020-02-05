@@ -22,3 +22,20 @@ export function handleDisconnect() {
         }
     });
 }
+
+// getting authentication user data
+export async function getAuthUser(userName: string, passwd: string) {
+    let promise = new Promise((resolve, reject) => {
+        handleDisconnect();
+        var query = "SELECT * FROM users WHERE username LIKE '" + userName + "' AND passwd LIKE '" + passwd + "' LIMIT 1";
+        connection.query(query, function (err, resultUser) {
+            if (err || resultUser.length == 0) {
+                reject(err);
+            } else {
+                resolve(resultUser[0]);
+            }
+        });
+        connection.end();
+    });
+    return promise;
+}

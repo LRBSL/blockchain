@@ -10,10 +10,10 @@ create table users(
   identityName VARCHAR(100) NOT NULL,
   identityOrg VARCHAR(50) NOT NULL
   );
--- insert into rlr_users values 
--- ('RLR001','colombo-01','colombo-01'), 
--- ('RLR002','colombo-02','colombo-02'), 
--- ('RLR003','negombo','negombo');
+insert into users(username,passwd,identityName,identityOrg) values 
+('admin-rlr','admin-rlr','admin','org1'), 
+('admin-surveyor','admin-surveyor','admin','org2'), 
+('admin-notary','admin-notary','admin','org3');
 
 -- rlr users table for login
 -- create table rlr_users(
