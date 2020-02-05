@@ -5,45 +5,16 @@ use lrbsl_database;
 -- authentication table
 create table users(
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(100) NOT NULL,
+  username VARCHAR(100) NOT NULL UNIQUE,
   passwd VARCHAR(255) NOT NULL,
   identityName VARCHAR(100) NOT NULL,
-  identityOrg VARCHAR(50) NOT NULL
+  identityOrg VARCHAR(50) NOT NULL,
+  UNIQUE (identityName,identityOrg)
   );
 insert into users(username,passwd,identityName,identityOrg) values 
-('admin-rlr','admin-rlr','admin','org1'), 
-('admin-surveyor','admin-surveyor','admin','org2'), 
-('admin-notary','admin-notary','admin','org3');
-
--- rlr users table for login
--- create table rlr_users(
---   id VARCHAR(10) PRIMARY KEY,
---   username VARCHAR(50) NOT NULL,
---   password VARCHAR(50) NOT NULL);
--- insert into rlr_users values 
--- ('RLR001','colombo-01','colombo-01'), 
--- ('RLR002','colombo-02','colombo-02'), 
--- ('RLR003','negombo','negombo');
-
--- notary users table for login
--- create table notary_users(
---   id VARCHAR(10) PRIMARY KEY,
---   username VARCHAR(50) NOT NULL,
---   password VARCHAR(50) NOT NULL);
--- insert into notary_users values 
--- ('NT001','ravindu','ravindu'),
--- ('NT002','sachintha','sachintha'),
--- ('NT003','gayan','gayan');
-
--- surveyor users table for login
--- create table surveyor_users(
---   id VARCHAR(10) PRIMARY KEY,
---   username VARCHAR(50) NOT NULL,
---   password VARCHAR(50) NOT NULL);
--- insert into surveyor_users values 
--- ('SV001','anura','anura'),
--- ('SV002','janindu','janindu'),
--- ('SV003','pasindu','pasindu');
+('admin-rlr','admin-rlr','user1','org1'), 
+('admin-surveyor','admin-surveyor','user1','org2'), 
+('admin-notary','admin-notary','user1','org3');
 
 -- member data table
 -- create table member_data(

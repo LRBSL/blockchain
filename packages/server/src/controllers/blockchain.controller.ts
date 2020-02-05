@@ -1,64 +1,122 @@
 import { Request, Response } from 'express';
-import { identity_config, updateSecurityConfig } from '../config';
-// import { createAdapter, backends, initServerIdentity, checkCryptographicMaterials } from '../convector';
-import { ClientFactory } from '@worldsibu/convector-core';
+import { backends } from '../convector';
 
-// export function PersonController_login_post(req: Request, res: Response) {
-//     let curUser = null;
-//     if (isUser1(req)) {
-//         curUser = user1;
-//     } else if (isUser2(req)) {
-//         curUser = user2;
-//     }
-//     if (curUser != null) {
-//         identity_config.identityName = curUser.identityName;
-//         identity_config.identityOrg = curUser.identityOrg;
-//         updateSecurityConfig();
+export async function LandController_queryLand_get(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.params;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .queryLand(params.id));
+    } catch (ex) {
+        console.log('Error get LandController_queryLand', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-//         backends.adapter = createAdapter();
-//         backends.initAdapter = backends.adapter.init();
-//         backends.PersonControllerBackEnd = ClientFactory(PersonController, backends.adapter);
+export async function LandController_queryAllLands_get(req: Request, res: Response): Promise<void> {
+    try {
+        res.status(200).send(await backends.LandControllerBackEnd
+            .queryAllLands());
+    } catch (ex) {
+        console.log('Error get LandController_queryAllLands', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-//         // optional
-//         initServerIdentity().then(() => {
-//             checkCryptographicMaterials().then(() => {
-//                 res.send(JSON.stringify(curUser.username + " successfully logged"));
-//             });
-//         });
-//     } else {
-//         res.send(JSON.stringify("user credentials are invalid"));
-//     }
-// }
+export async function LandController_getHistoryForLand_get(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.params;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .getHistoryForLand(params.id));
+    } catch (ex) {
+        console.log('Error get LandController_getHistoryForLand', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-// function isUser1(req: Request) {
-//     return req.body.username == "Ravindu" && req.body.password == "Ravindu96";
-// }
+export async function LandController_registerRLR_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .registerRLR(params.id, params.name));
+    } catch (ex) {
+        console.log('Error post LandController_registerRLR', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-// function isUser2(req: Request) {
-//     return req.body.username == "Sachintha" && req.body.password == "Sachintha96";
-// }
+export async function LandController_registerNotary_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .registerNotary(params.id, params.fullname, params.reg_id, params.nic, params.registered_rlr_id));
+    } catch (ex) {
+        console.log('Error post LandController_registerNotary', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-// export async function PersonController_register_post(req: Request, res: Response): Promise<void> {
-//     try {
-//         // let params = req.body;
-//         // res.status(200).send(await backends.PersonControllerBackEnd
-//         //     .register(params.person));
-//         createNewUser(req.body.userID, req.body.username);
+export async function LandController_registerSurveyor_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .registerSurveyor(params.id, params.fullname, params.reg_id, params.nic));
+    } catch (ex) {
+        console.log('Error post LandController_registerSurveyor', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-//     } catch (ex) {
-//         console.log('Error post PersonController_register', ex.stack);
-//         res.status(500).send(ex);
-//     }
-// }
+export async function LandController_changeLandOwner_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .changeLandOwner(params.id));
+    } catch (ex) {
+        console.log('Error post LandController_changeLandOwner', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-// export async function PersonController_get_get(req: Request, res: Response): Promise<void> {
-//     try {
-//         let params = req.params;
-//         res.status(200).send(await backends.PersonControllerBackEnd
-//             .get(params.id));
+export async function LandController_voteSurveyor_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .voteSurveyor(params.id, params.surveyorId));
+    } catch (ex) {
+        console.log('Error post LandController_changeLandOwner', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
 
-//     } catch (ex) {
-//         console.log('Error get PersonController_get', ex.stack);
-//         res.status(500).send(ex);
-//     }
-// }
+export async function LandController_voteNotary_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .voteNotary(params.id, params.notaryId, params.newOwnerNIC));
+    } catch (ex) {
+        console.log('Error post LandController_voteNotary', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
+
+export async function LandController_voteCurrentOwner_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .voteCurrentOwner(params.id, params.ownerVote));
+    } catch (ex) {
+        console.log('Error post LandController_voteCurrentOwner', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
+
+export async function LandController_forkLand_post(req: Request, res: Response): Promise<void> {
+    try {
+        let params = req.body;
+        res.status(200).send(await backends.LandControllerBackEnd
+            .forkLand(params.id, params.land1, params.land2, params.surveyorId));
+    } catch (ex) {
+        console.log('Error post LandController_forkLand', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+}
