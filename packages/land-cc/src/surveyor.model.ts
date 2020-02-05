@@ -7,10 +7,10 @@ import {
   Validate
 } from '@worldsibu/convector-core-model';
 
-export class Notary extends ConvectorModel<Notary> {
+export class Surveyor extends ConvectorModel<Surveyor> {
   @ReadOnly()
   @Required()
-  public readonly type = 'io.lrbsl.notary';
+  public readonly type = 'io.lrbsl.surveyor';
 
   @Required()
   @Validate(yup.string())
@@ -23,10 +23,6 @@ export class Notary extends ConvectorModel<Notary> {
   @Required()
   @Validate(yup.string())
   public nic: string;
-
-  @Required()
-  @Validate(yup.string())
-  public registered_rlr_id: string;
 
   @Validate(yup.boolean())
   @Required()
