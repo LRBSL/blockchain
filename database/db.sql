@@ -5,15 +5,16 @@ use lrbsl_database;
 -- authentication table
 create table users(
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(100) NOT NULL,
+  username VARCHAR(100) NOT NULL UNIQUE,
   passwd VARCHAR(255) NOT NULL,
   identityName VARCHAR(100) NOT NULL,
-  identityOrg VARCHAR(50) NOT NULL
+  identityOrg VARCHAR(50) NOT NULL,
+  UNIQUE (identityName,identityOrg)
   );
 insert into users(username,passwd,identityName,identityOrg) values 
-('admin-rlr','admin-rlr','admin','org1'), 
-('admin-surveyor','admin-surveyor','admin','org2'), 
-('admin-notary','admin-notary','admin','org3');
+('admin-rlr','admin-rlr','user1','org1'), 
+('admin-surveyor','admin-surveyor','user1','org2'), 
+('admin-notary','admin-notary','user1','org3');
 
 -- rlr users table for login
 -- create table rlr_users(
