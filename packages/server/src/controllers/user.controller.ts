@@ -8,6 +8,15 @@ import { LandController } from 'land-cc';
 import { getAuthUser, setAuthUser, deleteAuthUser, generateAuthUserIdentityName } from './database.controller';
 import { checkBodyParams, checkAdminPriviledges } from './utils';
 
+import * as httpStatusCodes from 'http-status-codes';
+
+import IController from '../types/IController';
+import userService from '../services/user.service';
+import { generateCookie } from '../utils/encrytionUtils';
+import constants from '../constants';
+import apiResponse from '../utils/apiResponse';
+import locale from '../constants/locale';
+
 const fabric_client = new Fabric_Client();
 let fabric_ca_client = null;
 let admin_user = null;
@@ -61,7 +70,7 @@ export async function LandController_register_post(req: Request, res: Response):
         let userId: string;
         checkBodyParams([params.username, params.passwd]);
         checkAdminPriviledges();
-        generateAuthUserIdentityName(identity_config.identityOrg).then((result:string) => {
+        generateAuthUserIdentityName(identity_config.identityOrg).then((result: string) => {
             userId = result;
         }).catch((err) => {
             throw new Error("Error occured in new user identity name generating process.")
@@ -148,3 +157,75 @@ export async function LandController_register_post(req: Request, res: Response):
         res.status(500).send('Error : ' + ex.message);
     }
 }
+
+// -------------------------------------------
+export async function LandController_userLogin_post(req: Request, res: Response) {
+    try {
+        let curUser = null;
+        let params = req.body;
+        checkBodyParams([params.username, params.passwd]);
+
+        await getAuthUser(params.username, params.passwd).then((result) => {
+            curUser = result;
+        }).catch((err) => {
+            console.log(err);
+        });
+
+        if (curUser != null) {
+            identity_config.identityName = curUser.identityName;
+            identity_config.identityOrg = curUser.identityOrg;
+            updateSecurityConfig();
+
+            backends.adapter = createAdapter();
+            backends.initAdapter = backends.adapter.init();
+            backends.LandControllerBackEnd = ClientFactory(LandController, backends.adapter);
+
+            // optional
+            initServerIdentity().then(() => {
+                checkCryptographicMaterials().then(() => {
+                    res.status(200).send(JSON.stringify(curUser.username + " successfully logged"));
+                });
+            });
+        } else {
+            res.status(404).send(JSON.stringify("user credentials are invalid"));
+        }
+    } catch (ex) {
+        console.log('Error post LandController_login', ex.stack);
+        res.status(500).send('Error : ' + ex.message);
+    }
+
+    // if (req.session.page_views) {
+    //     req.session.page_views++;
+    //     res.send("You visited this page " + req.session.page_views + " times");
+    // } else {
+    //     req.session.page_views = 1;
+    //     res.send("Welcome to this page for the first time!");
+    // }
+}
+
+const login: IController = async (req, res) => {
+    const user = await userService.loginUser(req.body.email, req.body.password);
+    if (user) {
+        const cookie = await generateUserCookie(user.id);
+        apiResponse.result(res, user, httpStatusCodes.OK, cookie);
+    } else {
+        apiResponse.error(res, httpStatusCodes.BAD_REQUEST, locale.INVALID_CREDENTIALS);
+    }
+};
+
+const self: IController = async (req, res) => {
+    const cookie = await generateUserCookie(req.user.id);
+    apiResponse.result(res, req.user, httpStatusCodes.OK, cookie);
+};
+
+const generateUserCookie = async (userId: number) => {
+    return {
+        key: constants.Cookie.COOKIE_USER,
+        value: await generateCookie(constants.Cookie.KEY_USER_ID, userId.toString()),
+    };
+};
+
+export default {
+    login,
+    self,
+};

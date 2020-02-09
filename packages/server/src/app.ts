@@ -1,29 +1,46 @@
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
-import { port as serverPort } from './config';
-import router from './controllers/router';
-import { handleDisconnect, getAuthUser } from './controllers/database.controller';
+import 'reflect-metadata';
+import { createConnection } from 'typeorm';
+import * as morgan from 'morgan';
 
-const app: express.Application = express();
-const port = serverPort;
+import express from './config/express';
+import application from './constants/application';
 
-app.use(bodyParser.urlencoded({
-  extended: true,
-  limit: '40mb'
-}));
+import * as errorHandler from './middlewares/apiErrorHandler';
+import joiErrorHandler from './middlewares/joiErrorHandler';
+import logger from './config/logger';
+import authenticate from './middlewares/authenticate';
 
-app.use(bodyParser.json({ limit: '40mb' }));
+import indexRoute from './routes/index';
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  next();
+const PORT = process.env.PORT || 8000;
+
+createConnection({
+  type: "mysql",
+  host: "172.230.0.1",
+  port: 3306,
+  username: "root",
+  password: "root",
+  database: "lrbsl_database"
+}).then(() => {
+  logger.info('database connection created');
+  express.use(morgan('dev'));
+  express.use(authenticate);
+
+  // Router
+  express.use(application.url.base, indexRoute);
+
+  // Joi Error Handler
+  express.use(joiErrorHandler);
+  // Error Handler
+  express.use(errorHandler.notFoundErrorHandler);
+
+  express.use(errorHandler.errorHandler);
+
+  express.listen(PORT, () => {
+    logger.info(`Server running at ${PORT}`);
+  });
+}).catch((error) => {
+  logger.info(`Database connection failed with error ${error}`);
 });
 
-app.use('/', router);
-
-app.listen(port, () =>
-  console.log(`Server started in port ${port}`));
-
-module.exports = app;
+export default express;
