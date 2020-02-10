@@ -16,27 +16,27 @@ export class User extends DateTimeEntity {
     @Column({ type: 'varchar' })
     type: string;
 
-    @Column({ type: 'varchar' })
-    regId: string;
+    @Column({ type: 'varchar', nullable: true })
+    regId?: string;
 
-    @Column({ type: 'varchar', default: 'first name' })
-    firstName: string;
+    @Column({ type: 'varchar', nullable: true })
+    firstName?: string;
 
-    @Column({ type: 'varchar', default: 'last name' })
-    lastName: string;
+    @Column({ type: 'varchar', nullable: true })
+    lastName?: string;
 
-    @Column({ type: 'varchar', default: 'nic' })
-    nic: string;
+    @Column({ type: 'varchar', nullable: true })
+    nic?: string;
 
-    @Column({ type: 'varchar', default: 'contact' })
-    contact: string;
+    @Column({ type: 'varchar', nullable: true })
+    contact?: string;
 
-    @Column({ type: 'varchar', default: 'postal address' })
-    postalAddress: string;
+    @Column({ type: 'varchar', nullable: true })
+    postalAddress?: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     lastLogin: string;
 
-    @Column({  type: "boolean", default: true })
+    @Column({ type: "boolean", default: true })
     isActive: boolean;
 }

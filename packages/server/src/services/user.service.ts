@@ -58,4 +58,5 @@ export default {
     createUserWithoutSanitize,
     loginUser,
     getUserById,
+    updateUser
 };

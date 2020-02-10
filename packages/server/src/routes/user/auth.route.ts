@@ -6,6 +6,7 @@ import userSchema from '../../constants/schema/user.schema';
 const router = express.Router();
 
 router.post('/register', schemaValidator(userSchema.register), userController.register);
+router.post('/register-notary', schemaValidator(userSchema.registerNotary), userController.registerNotary);
 router.post('/login-backend', schemaValidator(userSchema.loginBackend), userController.loginBackend);
 router.post('/login-blockchain-identity-name', 
 schemaValidator(userSchema.loginBlockchain), userController.loginBlockchain_identityName);

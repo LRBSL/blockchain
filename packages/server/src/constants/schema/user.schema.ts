@@ -9,6 +9,17 @@ export default {
             regId: joi.string().required()
         },
     },
+    registerNotary: {
+        body: {
+            notary: {
+                email: joi.string().email().required(),
+                regId: joi.string().required(),
+                fname: joi.string(),
+                lname: joi.string(),
+                nic: joi.string(),
+            }
+        },
+    },
     loginBackend: {
         body: {
             email: joi.string().email().required(),
