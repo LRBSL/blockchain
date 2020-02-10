@@ -204,7 +204,7 @@ export async function LandController_userLogin_post(req: Request, res: Response)
     // }
 }
 
-const login: IController = async (req, res) => {
+const loginBackend: IController = async (req, res) => {
     const user = await userService.loginUser(req.body.email, req.body.password);
     if (user) {
         const cookie = await generateUserCookie(user.id);
@@ -218,7 +218,6 @@ const register: IController = async (req, res) => {
     
     let user;
     try {
-        logger.info(req.body)
         user = await userService.createUser(req.body.email, req.body.password, req.body.name);
     } catch (e) {
         if (e.code === constants.ErrorCodes.DUPLICATE_ENTRY) {
@@ -249,6 +248,6 @@ const generateUserCookie = async (userId: number) => {
 
 export default {
     register,
-    login,
+    loginBackend,
     self,
 };

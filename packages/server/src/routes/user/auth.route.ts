@@ -6,7 +6,7 @@ import userSchema from '../../constants/schema/user.schema';
 const router = express.Router();
 
 router.post('/register', schemaValidator(userSchema.register), userController.register);
-router.post('/login', schemaValidator(userSchema.login), userController.login);
+router.post('/login-backend', schemaValidator(userSchema.login), userController.loginBackend);
 router.get('/me', userController.self);
 
 export default router;

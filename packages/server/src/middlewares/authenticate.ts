@@ -8,6 +8,7 @@ import { extractCookieFromRequest } from '../utils/apiUtils';
 import application from '../constants/application';
 import Constants from '../constants';
 import IRequest from '../types/IRequest';
+import logger from '../config/logger';
 
 /**
  * Route authentication middleware to verify a token
