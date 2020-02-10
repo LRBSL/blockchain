@@ -5,13 +5,18 @@ export default {
         body: {
             email: joi.string().email().required(),
             password: joi.string().min(6).max(32).required(),
-            name: joi.string().required(),
+            type: joi.string().required(),
+            regId: joi.string().required()
         },
     },
-    login: {
+    loginBackend: {
         body: {
             email: joi.string().email().required(),
             password: joi.string().required(),
+        },
+    },
+    loginBlockchain: {
+        body: {
         },
     },
     update: {

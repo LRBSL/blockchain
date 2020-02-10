@@ -11,7 +11,7 @@ export default {
         authSecret: process.env.TOKEN_SECRET_KEY || 'test',
     },
     authorizationIgnorePath: [
-        `${base}/user/auth/login`,
+        `${base}/user/auth/login-backend`,
         `${base}/user/auth/register`
     ],
 };

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { identity_config, updateSecurityConfig, security_config, ca_ports } from '../config';
-import { backends, createAdapter, initServerIdentity, checkCryptographicMaterials } from '../convector';
+import { backends, createAdapter, initServerIdentity, checkCryptographicMaterials, createBCAdapter, initServerIdentityForBC, checkCryptographicMaterialsForBC } from '../convector';
 import { ClientFactory } from '@worldsibu/convector-core';
 import * as Fabric_Client from 'fabric-client';
 import * as Fabric_CA_Client from 'fabric-ca-client';
@@ -12,11 +12,15 @@ import * as httpStatusCodes from 'http-status-codes';
 
 import IController from '../types/IController';
 import userService from '../services/user.service';
-import { generateCookie } from '../utils/encrytionUtils';
+import { generateCookie, verifyCookie } from '../utils/encrytionUtils';
 import constants from '../constants';
 import apiResponse from '../utils/apiResponse';
 import locale from '../constants/locale';
 import logger from '../config/logger';
+import bcUserService from '../services/bcUser.service';
+import { extractCookieFromRequest, extractBCCookiesFromRequest } from '../utils/apiUtils';
+import Constants from '../constants';
+import { getKeyStore, getNetworkProfile } from '../utils/bcUtils';
 
 const fabric_client = new Fabric_Client();
 let fabric_ca_client = null;
@@ -214,11 +218,49 @@ const loginBackend: IController = async (req, res) => {
     }
 };
 
+const loginBlockchain_identityName: IController = async (req, res) => {
+    const bcUser = bcUserService.getBcUserById(req.user.id);
+    const cookie = generateBlockchainCookie("identityName", (await bcUser).identityName);
+    apiResponse.result(res, null, httpStatusCodes.OK, cookie);
+};
+
+const loginBlockchain_identityOrg: IController = async (req, res) => {
+    const bcUser = bcUserService.getBcUserById(req.user.id);
+    const cookie = generateBlockchainCookie("identityOrg", (await bcUser).identityOrg);
+    apiResponse.result(res, null, httpStatusCodes.OK, cookie);
+};
+
+const loginBlochain: IController = async (req, res) => {
+    try {
+        const data = extractBCCookiesFromRequest(req.headers.cookie);
+        const identityName: string = data.identityName;
+        const identityOrg: string = data.identityOrg;
+        
+        const keyStore: string = getKeyStore(identityOrg);
+        const networkProfile: string = getNetworkProfile(identityOrg);
+
+        const adapter = createBCAdapter(identityName, keyStore, networkProfile);
+        await adapter.init();
+
+        const landCtrlBackend = ClientFactory(LandController, adapter);
+
+        // optional
+        initServerIdentityForBC(landCtrlBackend).then(() => {
+            checkCryptographicMaterialsForBC(keyStore, identityName).then(() => {
+                apiResponse.result(res, {massage: "User successfully logged to the blockchain"}, httpStatusCodes.OK);
+            });
+        });
+
+    } catch (ex) {
+        apiResponse.error(res, httpStatusCodes.INTERNAL_SERVER_ERROR, ex);
+    }
+};
+
 const register: IController = async (req, res) => {
-    
+
     let user;
     try {
-        user = await userService.createUser(req.body.email, req.body.password, req.body.name);
+        user = await userService.createUser(req.body.email, req.body.password, req.body.type, req.body.regId);
     } catch (e) {
         if (e.code === constants.ErrorCodes.DUPLICATE_ENTRY) {
             apiResponse.error(res, httpStatusCodes.BAD_REQUEST,
@@ -246,8 +288,32 @@ const generateUserCookie = async (userId: number) => {
     };
 };
 
+const generateBlockchainCookie = (key: string, value: string) => {
+    return {
+        key: key,
+        value: value,
+    };
+};
+
+var landControllerBackEnd = async (req: any) => {
+    const decoded = await verifyCookie(extractCookieFromRequest(req, Constants.Cookie.COOKIE_USER));
+
+    const identityName: string = decoded.data[Constants.Cookie.KEY_IDENTITY_NAME];
+    const identityOrg: string = decoded.data[Constants.Cookie.KEY_IDENTITY_ORG];
+    const keyStore: string = getKeyStore(identityOrg);
+    const networkProfile: string = getNetworkProfile(identityOrg);
+
+    const adapter = createBCAdapter(identityName, keyStore, networkProfile);
+    await adapter.init();
+
+    return ClientFactory(LandController, adapter);
+}
+
 export default {
     register,
     loginBackend,
+    loginBlockchain_identityName,
+    loginBlockchain_identityOrg,
+    loginBlochain,
     self,
 };

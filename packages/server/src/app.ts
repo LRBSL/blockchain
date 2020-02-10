@@ -11,6 +11,7 @@ import logger from './config/logger';
 import authenticate from './middlewares/authenticate';
 
 import indexRoute from './routes/index';
+import { seedData } from './utils/seed.data';
 
 const PORT = process.env.PORT || 8000;
 
@@ -33,7 +34,7 @@ createConnection({
   connectTimeout: 30000,
   acquireTimeout: 30000,
   maxQueryExecutionTime: 5000
-}).then(() => {
+}).then(async () => {
   logger.info('database connection created');
   express.use(morgan('dev'));
   express.use(authenticate);
@@ -47,6 +48,8 @@ createConnection({
   express.use(errorHandler.notFoundErrorHandler);
 
   express.use(errorHandler.errorHandler);
+
+  await seedData();
 
   express.listen(PORT, () => {
     logger.info(`Server running at ${PORT}`);

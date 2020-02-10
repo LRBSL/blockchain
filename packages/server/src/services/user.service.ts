@@ -19,12 +19,22 @@ const getUserByEmail = async (email: string, getHash: boolean = false) => {
     }
 };
 
-const createUser = async (email: string, pass: string, name: string = '') => {
+const createUser = async (email: string, pass: string, type: string, regId: string) => {
     const newUser = new User();
     newUser.email = email;
     newUser.password = await generateHash(pass, 10);
-    newUser.name = name;
+    newUser.type = type;
+    newUser.regId = regId;
     return sanitizeUser(await getRepository(User).save(newUser));
+};
+
+const createUserWithoutSanitize = async (email: string, pass: string, type: string, regId: string) => {
+    const newUser = new User();
+    newUser.email = email;
+    newUser.password = await generateHash(pass, 10);
+    newUser.type = type;
+    newUser.regId = regId;
+    return await getRepository(User).save(newUser);
 };
 
 const updateUser = async (user: User) => {
@@ -45,6 +55,7 @@ const loginUser = async (email: string, password: string) => {
 
 export default {
     createUser,
+    createUserWithoutSanitize,
     loginUser,
     getUserById,
 };

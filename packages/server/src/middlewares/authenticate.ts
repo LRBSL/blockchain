@@ -30,7 +30,7 @@ export default async (req: IRequest, res: express.Response, next: express.NextFu
                 if (user) {
                     // @ts-ignore
                     req.user = user;
-                    req.dashboard = req.headers['context'] === 'dashboard' && user.isStaff;
+                    // req.dashboard = req.headers['context'] === 'dashboard' && user.isStaff;
                 } else {
                     apiResponse.error(res, httpStatusCodes.UNAUTHORIZED);
                     return;

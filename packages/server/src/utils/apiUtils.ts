@@ -4,6 +4,7 @@ import * as HttpStatusCode from 'http-status-codes';
 import { User } from '../entities/user/user.entity';
 import IRequest from '../types/IRequest';
 import ApiResponse from './apiResponse';
+import logger from '../config/logger';
 
 const extractUserIdFromRequest = (req: IRequest) => {
     return req.user.id;
@@ -32,6 +33,15 @@ const extractCookieFromRequest = (req: Request, key: string) => {
     return null;
 };
 
+const extractBCCookiesFromRequest = (cookie: string) => {
+    const cok = cookie.split(';');
+    const result = {
+        identityName: cok[1].split("=")[1],
+        identityOrg: cok[2].split("=")[1],
+    }
+    return result;
+};
+
 const sanitizeUser = (user: User) => {
     const { password, ...userWithOutPassword } = user;
     return userWithOutPassword;
@@ -49,5 +59,6 @@ export {
     extractUserIdFromRequest,
     extractQueryForRequest,
     sanitizeUser,
-    extractCookieFromRequest
+    extractCookieFromRequest,
+    extractBCCookiesFromRequest
 };
