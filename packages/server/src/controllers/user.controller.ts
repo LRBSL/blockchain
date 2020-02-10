@@ -16,6 +16,7 @@ import { generateCookie } from '../utils/encrytionUtils';
 import constants from '../constants';
 import apiResponse from '../utils/apiResponse';
 import locale from '../constants/locale';
+import logger from '../config/logger';
 
 const fabric_client = new Fabric_Client();
 let fabric_ca_client = null;
@@ -213,6 +214,27 @@ const login: IController = async (req, res) => {
     }
 };
 
+const register: IController = async (req, res) => {
+    
+    let user;
+    try {
+        logger.info(req.body)
+        user = await userService.createUser(req.body.email, req.body.password, req.body.name);
+    } catch (e) {
+        if (e.code === constants.ErrorCodes.DUPLICATE_ENTRY) {
+            apiResponse.error(res, httpStatusCodes.BAD_REQUEST,
+                locale.EMAIL_ALREADY_EXISTS);
+            return;
+        }
+    }
+    if (user) {
+        const cookie = await generateUserCookie(user.id);
+        apiResponse.result(res, user, httpStatusCodes.CREATED, cookie);
+    } else {
+        apiResponse.error(res, httpStatusCodes.BAD_REQUEST);
+    }
+};
+
 const self: IController = async (req, res) => {
     const cookie = await generateUserCookie(req.user.id);
     apiResponse.result(res, req.user, httpStatusCodes.OK, cookie);
@@ -226,6 +248,7 @@ const generateUserCookie = async (userId: number) => {
 };
 
 export default {
+    register,
     login,
     self,
 };

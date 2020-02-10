@@ -20,7 +20,19 @@ createConnection({
   port: 3306,
   username: "root",
   password: "root",
-  database: "lrbsl_database"
+  database: "lrbsl_database",
+  charset: "utf8",
+  synchronize: process.env.NODE_ENV !== 'production',
+  entities: [
+    '**/**.entity.ts'
+  ],
+  migrations: ["migration/*.ts"],
+  cli: {
+    migrationsDir: "migration"
+  },
+  connectTimeout: 30000,
+  acquireTimeout: 30000,
+  maxQueryExecutionTime: 5000
 }).then(() => {
   logger.info('database connection created');
   express.use(morgan('dev'));
