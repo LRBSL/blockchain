@@ -35,4 +35,13 @@ export default {
 
         },
     },
+    bcQueryLand: {
+        body: {
+            id: joi.string().required()
+        },
+    },
+    bcQueryAllLands: {
+        body: {
+        },
+    }
 };

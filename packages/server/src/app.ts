@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 8000;
 
 createConnection({
   type: "mysql",
-  host: "172.230.0.1",
+  host: "database",
   port: 3306,
   username: "root",
   password: "root",

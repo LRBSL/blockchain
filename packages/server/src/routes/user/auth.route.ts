@@ -12,7 +12,7 @@ router.post('/login-blockchain-identity-name',
 schemaValidator(userSchema.loginBlockchain), userController.loginBlockchain_identityName);
 router.post('/login-blockchain-identity-org', 
 schemaValidator(userSchema.loginBlockchain), userController.loginBlockchain_identityOrg);
-router.post('/login-blockchain', schemaValidator(userSchema.loginBlockchain), userController.loginBlochain);
+router.post('/login-blockchain', schemaValidator(userSchema.loginBlockchain), userController.loginBlockchain);
 router.get('/me', userController.self);
 
 export default router;

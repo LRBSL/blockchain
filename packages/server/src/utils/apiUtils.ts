@@ -22,7 +22,7 @@ const extractCookieFromRequest = (req: Request, key: string) => {
         return req.headers.authorization;
     }
     if (req.headers.cookie) {
-        const results = req.headers.cookie.split(';');
+        const results = req.headers.cookie.toString().split(';');
         const filtered = results.filter((result) => {
             return result.startsWith(`${key}=`);
         });
