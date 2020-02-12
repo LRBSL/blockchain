@@ -131,8 +131,8 @@ export async function LandController_forkLand_post(req: Request, res: Response):
 
 const queryLand: IController = async (req, res) => {
     try {
-        let land = (await bcBackendGenerator(req)).queryLand(req.body.id);
-        logger.info(land);
+        let landBackend = await bcBackendGenerator(req);
+        let land = await landBackend.queryLand(req.body.id);
         apiResponse.result(res, land, httpStatusCodes.OK);
     } catch (ex) {
         apiResponse.error(res, httpStatusCodes.BAD_REQUEST, ex.message);
@@ -141,7 +141,8 @@ const queryLand: IController = async (req, res) => {
 
 const queryAllLands: IController = async (req, res) => {
     try {
-        let lands = (await bcBackendGenerator(req)).queryAllLands();
+        let landBackend = await bcBackendGenerator(req);
+        let lands = await landBackend.queryAllLands();
         apiResponse.result(res, lands, httpStatusCodes.OK);
     } catch (ex) {
         apiResponse.error(res, httpStatusCodes.BAD_REQUEST, ex.message);
@@ -167,7 +168,9 @@ const bcBackendGenerator = async (req) => {
     const networkProfile: string = getNetworkProfile(identityOrg);
 
     const adapter = createBCAdapter(identityName, keyStore, networkProfile);
-    await adapter.init();
+    await adapter.init().then(() => {
+        console.log("adapter initialized");
+    }).catch((err) => console.log(err));
 
     return ClientFactory(LandController, adapter);
 }
