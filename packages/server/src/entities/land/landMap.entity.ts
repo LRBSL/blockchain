@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, Unique, OneToOne, JoinColumn, P
 import { User } from '../user/user.entity';
 import { Land } from './land.entity';
 
-@Entity('land_map', { orderBy: { id: 'ASC' } })
+// @Entity('land_map', { orderBy: { id: 'ASC' } })
 export class LandMap {
     @OneToOne(() => Land, { primary: true, cascade: true, onDelete: "CASCADE", onUpdate: "CASCADE" })
     @JoinColumn({ name: "id" })

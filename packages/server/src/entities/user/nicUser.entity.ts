@@ -1,6 +1,6 @@
 import { Column, Entity } from 'typeorm';
 
-@Entity('nic_user', { orderBy: { nic_no: 'ASC' } })
+// @Entity('nic_user', { orderBy: { nic_no: 'ASC' } })
 export class NicUser {
     @Column({ type: 'varchar', primary: true })
     nic_no: string;
