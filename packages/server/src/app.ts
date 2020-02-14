@@ -11,7 +11,8 @@ import logger from './config/logger';
 import authenticate from './middlewares/authenticate';
 
 import indexRoute from './routes/index';
-import { seedData } from './utils/seed.data';
+import { seedData1, seedData2, seedData, down } from './utils/seed.data';
+import userService from './services/user.service';
 
 const PORT = process.env.PORT || 8000;
 
@@ -34,7 +35,7 @@ createConnection({
   connectTimeout: 30000,
   acquireTimeout: 30000,
   maxQueryExecutionTime: 5000
-}).then(async () => {
+}).then(async (connection) => {
   logger.info('database connection created');
   express.use(morgan('dev'));
   express.use(authenticate);
@@ -49,7 +50,20 @@ createConnection({
 
   express.use(errorHandler.errorHandler);
 
-  await seedData();
+  // await userService.getUsersCount().then(async (count) => {
+  //   if(count <= 0) {
+  //     await seedData1();
+  //   }
+  //   await seedData2();
+  // }).catch((err) => console.log(err));
+
+  let queryRunner = connection.createQueryRunner();
+  await queryRunner.connect().then((res) => {
+    console.log("##########" + res)
+  }).catch((err) => {console.log(err)});
+  await down(queryRunner).then((res) => {
+    console.log("@@@@@@@2" + res)
+  }).catch((err) => {console.log(err)});
 
   express.listen(PORT, () => {
     logger.info(`Server running at ${PORT}`);

@@ -1,11 +1,28 @@
 import { getRepository } from 'typeorm';
 import { User } from '../entities/user/user.entity';
+import { NicUser } from '../entities/user/nicUser.entity';
 import { generateHash, verifyHash } from '../utils/encrytionUtils';
 import { sanitizeUser } from '../utils/apiUtils';
 
 const getUserById = async (userId: number) => {
     try {
         return await sanitizeUser(await getRepository(User).findOne({ id: userId }));
+    } catch (e) {
+        return null;
+    }
+};
+
+const getUserByNic = async (userNic: string) => {
+    try {
+        return await getRepository(User).findOne({ nic: userNic });
+    } catch (e) {
+        return null;
+    }
+};
+
+const getUsersCount = async () => {
+    try {
+        return (await getRepository(User).find({})).length
     } catch (e) {
         return null;
     }
@@ -53,10 +70,33 @@ const loginUser = async (email: string, password: string) => {
     return null;
 };
 
+// ----------------- NIC ---------------
+const getNicUserByNic = async (nic: string) => {
+    try {
+        return await getRepository(NicUser).findOne({ nic_no: nic });
+    } catch (e) {
+        return null;
+    }
+};
+
+const createNicUser = async (nic_no: string, name: string, address: string, sex: string, regDate: Date) => {
+    const newNicUser = new NicUser();
+    newNicUser.nic_no = nic_no;
+    newNicUser.name = name;
+    newNicUser.address = address;
+    newNicUser.sex = sex;
+    newNicUser.regDate = regDate;
+    return await getRepository(NicUser).save(newNicUser);
+};
+
 export default {
+    getUsersCount,
     createUser,
     createUserWithoutSanitize,
     loginUser,
     getUserById,
-    updateUser
+    updateUser,
+    getUserByNic,
+    getNicUserByNic,
+    createNicUser
 };

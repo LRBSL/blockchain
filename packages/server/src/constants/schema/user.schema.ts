@@ -43,5 +43,10 @@ export default {
     bcQueryAllLands: {
         body: {
         },
+    },
+    getUserByNic: {
+        body: {
+            nic: joi.string().required()
+        },
     }
 };

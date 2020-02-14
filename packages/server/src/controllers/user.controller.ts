@@ -166,21 +166,6 @@ const registerNotary: IController = async (req, res) => {
 
             await bcUserService.createBcUser(savUser, newIdentityName, "org3");
 
-            // let mailOptions = {
-            //     from: 'rstmpgd1@gmail.com',
-            //     to: req.body.notary.email,
-            //     subject: 'Notary User Registration',
-            //     text: 'You have been registered as a notary in LRBSL system. Your current password is your email. You can change it by logging the system'
-            // }
-
-            // transporter.sendMail(mailOptions, function (error, info) {
-            //     if (error) {
-            //         logger.info(error);
-            //     } else {
-            //         logger.info('Email sent: ' + info.response);
-            //     }
-            // });
-
             logger.info(newIdentityName + ' was successfully registered and enrolled and is ready to interact with the fabric network');
             apiResponse.result(res, { message: newIdentityName + ' was successfully registered and enrolled' }, httpStatusCodes.CREATED);
         }).catch((err) => {
@@ -266,21 +251,6 @@ const registerSurveyor: IController = async (req, res) => {
 
             await bcUserService.createBcUser(savUser, newIdentityName, "org2");
 
-            // let mailOptions = {
-            //     from: 'rstmpgd1@gmail.com',
-            //     to: req.body.notary.email,
-            //     subject: 'Notary User Registration',
-            //     text: 'You have been registered as a notary in LRBSL system. Your current password is your email. You can change it by logging the system'
-            // }
-
-            // transporter.sendMail(mailOptions, function (error, info) {
-            //     if (error) {
-            //         logger.info(error);
-            //     } else {
-            //         logger.info('Email sent: ' + info.response);
-            //     }
-            // });
-
             logger.info(newIdentityName + ' was successfully registered and enrolled and is ready to interact with the fabric network');
             apiResponse.result(res, { message: newIdentityName + ' was successfully registered and enrolled' }, httpStatusCodes.CREATED);
         }).catch((err) => {
@@ -315,6 +285,15 @@ const generateBlockchainCookie = (key: string, value: string) => {
     };
 };
 
+const getUserByNic: IController = async (req, res) => {
+    const user = await userService.getNicUserByNic(req.body.nic);
+    if (user) {
+        apiResponse.result(res, user, httpStatusCodes.OK);
+    } else {
+        apiResponse.error(res, httpStatusCodes.NOT_FOUND, locale.INVALID_CREDENTIALS);
+    }
+};
+
 
 export default {
     register,
@@ -324,5 +303,6 @@ export default {
     loginBlockchain,
     registerNotary,
     registerSurveyor,
+    getUserByNic,
     self,
 };

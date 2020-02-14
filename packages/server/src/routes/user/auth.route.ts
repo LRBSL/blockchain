@@ -14,6 +14,9 @@ schemaValidator(userSchema.loginBlockchain), userController.loginBlockchain_iden
 router.post('/login-blockchain-identity-org', 
 schemaValidator(userSchema.loginBlockchain), userController.loginBlockchain_identityOrg);
 router.post('/login-blockchain', schemaValidator(userSchema.loginBlockchain), userController.loginBlockchain);
+
+router.post('/get-by-nic', schemaValidator(userSchema.getUserByNic), userController.getUserByNic);
+
 router.get('/me', userController.self);
 router.get('/test', () => sendMail("ravindusachintha53@gmail.com", "Hello", "World"))
 
