@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 import {
   ConvectorModel,
-  Default,
   ReadOnly,
   Required,
   Validate

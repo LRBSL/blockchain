@@ -9,9 +9,6 @@ import {
 } from '@worldsibu/convector-core';
 
 import { Land } from './land.model';
-import { RLR } from './rlr.model';
-import { Notary } from './notary.model';
-import { Surveyor } from './surveyor.model';
 
 @Controller('land')
 export class LandController extends ConvectorController<ChaincodeTx> {
@@ -100,91 +97,6 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     return "mock data successfully initialized";
   }
 
-  // Register RLR
-  @Invokable()
-  public async registerRLR(
-    @Param(yup.string()) id: string,
-    @Param(yup.string()) name: string
-  ) {
-    if (!this.checkOrgPriviledges('rlr')) {
-      throw new Error('User has no priviledges to execute this action');
-    }
-    // Retrieve to see if exists
-    const existing = await RLR.getOne(id);
-
-    if (!existing || !existing.id) {
-      let rlr = new RLR();
-      rlr.id = id;
-      rlr.name = name;
-      rlr.fingerprint = this.sender;
-      rlr.active_status = true;
-
-      await rlr.save();
-    } else {
-      throw new Error('Error : Identity exists already');
-    }
-  }
-
-  // Register Notary
-  @Invokable()
-  public async registerNotary(
-    @Param(yup.string()) id: string,
-    @Param(yup.string()) fullname: string,
-    @Param(yup.string()) reg_id: string,
-    @Param(yup.string()) nic: string,
-    @Param(yup.string()) registered_rlr_id: string,
-  ) {
-    if (!this.checkOrgPriviledges('notary')) {
-      throw new Error('User has no priviledges to execute this action');
-    }
-    // Retrieve to see if exists
-    const existing = await Notary.getOne(id);
-
-    if (!existing || !existing.id) {
-      let notary = new Notary();
-      notary.id = id;
-      notary.fullname = fullname;
-      notary.reg_id = reg_id;
-      notary.nic = nic;
-      notary.registered_rlr_id = registered_rlr_id;
-      notary.fingerprint = this.sender;
-      notary.active_status = true;
-
-      await notary.save();
-    } else {
-      throw new Error('Error : Identity exists already');
-    }
-  }
-
-  // Register Surveyor
-  @Invokable()
-  public async registerSurveyor(
-    @Param(yup.string()) id: string,
-    @Param(yup.string()) fullname: string,
-    @Param(yup.string()) reg_id: string,
-    @Param(yup.string()) nic: string,
-  ) {
-    if (!this.checkOrgPriviledges('surveyor')) {
-      throw new Error('User has no priviledges to execute this action');
-    }
-    // Retrieve to see if exists
-    const existing = await Surveyor.getOne(id);
-
-    if (!existing || !existing.id) {
-      let surveyor = new Surveyor();
-      surveyor.id = id;
-      surveyor.fullname = fullname;
-      surveyor.reg_id = reg_id;
-      surveyor.nic = nic;
-      surveyor.fingerprint = this.sender;
-      surveyor.active_status = true;
-
-      await surveyor.save();
-    } else {
-      throw new Error('Error : Identity exists already');
-    }
-  }
-
   // Get land information by ID
   @Invokable()
   public async queryLand(@Param(yup.string()) id: string): Promise<Land> {
@@ -200,12 +112,6 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     return Land.getAll();
   }
 
-  // Create land - for internal use only
-  @Invokable()
-  private async createLand(@Param(Land) land: Land) {
-    await land.save();
-    return "successfully land created";
-  }
 
   // Change land ownership
   @Invokable()
@@ -285,7 +191,7 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     let land_set: Land[];
     let lands: Land[] = await Land.getAll();
     lands.forEach((land: Land) => {
-      if(land.surveyor_vote == surveyorId) {
+      if (land.surveyor_vote == surveyorId) {
         land_set.push(land);
       }
     });
@@ -298,7 +204,7 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     let land_set: Land[];
     let lands: Land[] = await Land.getAll();
     lands.forEach((land: Land) => {
-      if(land.notary_vote == notaryId) {
+      if (land.notary_vote == notaryId) {
         land_set.push(land);
       }
     });
@@ -311,7 +217,7 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     let land_set: Land[];
     let lands: Land[] = await Land.getAll();
     lands.forEach((land: Land) => {
-      if(land.rlregistry == rlrId) {
+      if (land.rlregistry == rlrId) {
         land_set.push(land);
       }
     });
@@ -325,56 +231,104 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     @Param(Land) land1: Land,
     @Param(Land) land2: Land,
     @Param(yup.string()) surveyorId: string) {
-      if (!this.checkOrgPriviledges('surveyor')) {
-        throw new Error('User has no priviledges to execute this action');
-      }
+    if (!this.checkOrgPriviledges('surveyor')) {
+      throw new Error('User has no priviledges to execute this action');
+    }
 
-      let parent_land: Land = await Land.getOne(id);
-      
-      // check to confirm that all the coordinates are inside parent land
-      land1.boundaries.forEach(point => {
-        this.checkPointInsideLand(parent_land, point);
-      });
-      land2.boundaries.forEach(point => {
-        this.checkPointInsideLand(parent_land, point);
-      });
+    let parent_land: Land = await Land.getOne(id);
 
-      // check to confirm that land coordinates are not overlapping
-      land1.boundaries.forEach(point => {
-        this.checkPointOutsideLand(land2, point);
-      });
-      land2.boundaries.forEach(point => {
-        this.checkPointOutsideLand(land1, point);
-      });
+    // check to confirm that all the coordinates are inside parent land
+    land1.boundaries.forEach(point => {
+      this.checkPointInsideLand(parent_land, point);
+    });
+    land2.boundaries.forEach(point => {
+      this.checkPointInsideLand(parent_land, point);
+    });
 
-      // create new lands
-      land1.id = parent_land.id + "1";
-      land1.parent_land_id = parent_land.id;
-      land1.current_owner_nic = parent_land.current_owner_nic;
-      land1.requested_new_owner_nic = null;
-      land1.rlregistry = parent_land.rlregistry;
-      land1.surveyor_vote = surveyorId;
-      land1.notary_vote = null;
-      land1.current_owner_vote = null;
-      land1.extent = this.calculateArea([land1.boundaries[0], land1.boundaries[1], land1.boundaries[2], land1.boundaries[3]]);
+    // check to confirm that land coordinates are not overlapping
+    land1.boundaries.forEach(point => {
+      this.checkPointOutsideLand(land2, point);
+    });
+    land2.boundaries.forEach(point => {
+      this.checkPointOutsideLand(land1, point);
+    });
 
-      land2.id = parent_land.id + "2";
-      land2.parent_land_id = parent_land.id;
-      land2.current_owner_nic = parent_land.current_owner_nic;
-      land2.requested_new_owner_nic = null;
-      land2.rlregistry = parent_land.rlregistry;
-      land2.surveyor_vote = surveyorId;
-      land2.notary_vote = null;
-      land2.current_owner_vote = null;
-      land2.extent = this.calculateArea([land2.boundaries[0], land2.boundaries[1], land2.boundaries[2], land2.boundaries[3]]);
-      
-      await land1.save();
-      await land2.save();
+    // create new lands
+    land1.id = parent_land.id + "1";
+    land1.parent_land_id = parent_land.id;
+    land1.current_owner_nic = parent_land.current_owner_nic;
+    land1.requested_new_owner_nic = null;
+    land1.rlregistry = parent_land.rlregistry;
+    land1.surveyor_vote = surveyorId;
+    land1.notary_vote = null;
+    land1.current_owner_vote = null;
+    land1.extent = this.calculateArea([land1.boundaries[0], land1.boundaries[1], land1.boundaries[2], land1.boundaries[3]]);
 
+    land2.id = parent_land.id + "2";
+    land2.parent_land_id = parent_land.id;
+    land2.current_owner_nic = parent_land.current_owner_nic;
+    land2.requested_new_owner_nic = null;
+    land2.rlregistry = parent_land.rlregistry;
+    land2.surveyor_vote = surveyorId;
+    land2.notary_vote = null;
+    land2.current_owner_vote = null;
+    land2.extent = this.calculateArea([land2.boundaries[0], land2.boundaries[1], land2.boundaries[2], land2.boundaries[3]]);
+
+    await land1.save();
+    await land2.save();
+
+    return {
+      land1: land1.id,
+      land2: land2.id
+    }
+  }
+
+  private checkPointInsideLand(land: Land, p: number[]) {
+    let landArea = this.calculateArea([land.boundaries[0], land.boundaries[1], land.boundaries[2], land.boundaries[3]]);
+    let area1 = this.calculateArea([land.boundaries[0], land.boundaries[1], p]);
+    let area2 = this.calculateArea([land.boundaries[1], land.boundaries[2], p]);
+    let area3 = this.calculateArea([land.boundaries[2], land.boundaries[3], p]);
+    let area4 = this.calculateArea([land.boundaries[3], land.boundaries[0], p]);
+    if (landArea < area1 + area2 + area3 + area4) {
+      throw new Error('Some coordinates are incorrect. Check again.');
+    }
+  }
+
+  private checkPointOutsideLand(land: Land, p: number[]) {
+    let landArea = this.calculateArea([land.boundaries[0], land.boundaries[1], land.boundaries[2], land.boundaries[3]]);
+    let area1 = this.calculateArea([land.boundaries[0], land.boundaries[1], p]);
+    let area2 = this.calculateArea([land.boundaries[1], land.boundaries[2], p]);
+    let area3 = this.calculateArea([land.boundaries[2], land.boundaries[3], p]);
+    let area4 = this.calculateArea([land.boundaries[3], land.boundaries[0], p]);
+    if (landArea >= area1 + area2 + area3 + area4) {
+      throw new Error('Land coordinates are overlapping. Check again.');
+    }
+  }
+
+  private calculateArea(points, signed?: boolean) {
+    var l = points.length
+    var det = 0
+    var isSigned = signed || false
+
+    function normalize(point) {
+      if (!Array.isArray(point)) return point
       return {
-        land1: land1.id,
-        land2: land2.id
+        x: point[0],
+        y: point[1]
       }
+    }
+
+    points = points.map(normalize)
+    if (points[0] != points[points.length - 1])
+      points = points.concat(points[0])
+
+    for (var i = 0; i < l; i++)
+      det += points[i].x * points[i + 1].y
+        - points[i].y * points[i + 1].x
+    if (isSigned)
+      return det / 2
+    else
+      return Math.abs(det) / 2
   }
 
   private checkOrgPriviledges(org: string) {
@@ -388,54 +342,4 @@ export class LandController extends ConvectorController<ChaincodeTx> {
       return this.tx.identity.getMSPID() === 'org3MSP';
     }
   }
-
-  private checkPointInsideLand(land: Land, p: number[]) {
-    let landArea = this.calculateArea([land.boundaries[0], land.boundaries[1], land.boundaries[2], land.boundaries[3]]);
-    let area1 = this.calculateArea([land.boundaries[0], land.boundaries[1], p]);
-    let area2 = this.calculateArea([land.boundaries[1], land.boundaries[2], p]);
-    let area3 = this.calculateArea([land.boundaries[2], land.boundaries[3], p]);
-    let area4 = this.calculateArea([land.boundaries[3], land.boundaries[0], p]);
-    if(landArea < area1+area2+area3+area4) {
-      throw new Error('Some coordinates are incorrect. Check again.');
-    }
-  }
-
-  private checkPointOutsideLand(land: Land, p: number[]) {
-    let landArea = this.calculateArea([land.boundaries[0], land.boundaries[1], land.boundaries[2], land.boundaries[3]]);
-    let area1 = this.calculateArea([land.boundaries[0], land.boundaries[1], p]);
-    let area2 = this.calculateArea([land.boundaries[1], land.boundaries[2], p]);
-    let area3 = this.calculateArea([land.boundaries[2], land.boundaries[3], p]);
-    let area4 = this.calculateArea([land.boundaries[3], land.boundaries[0], p]);
-    if(landArea >= area1+area2+area3+area4) {
-      throw new Error('Land coordinates are overlapping. Check again.');
-    }
-  }
-
-  private calculateArea (points,signed?: boolean) {
-    var l = points.length
-    var det = 0
-    var isSigned = signed || false
-
-    function normalize(point) {
-      if (!Array.isArray(point)) return point
-      return {
-        x: point[0],
-        y: point[1]
-      }
-    }
-  
-    points = points.map(normalize)
-    if (points[0] != points[points.length -1])  
-      points = points.concat(points[0])
-  
-    for (var i = 0; i < l; i++)
-      det += points[i].x * points[i + 1].y
-        - points[i].y * points[i + 1].x
-    if (isSigned)
-      return det / 2
-    else
-      return Math.abs(det) / 2
-  }
-
-  
 }
