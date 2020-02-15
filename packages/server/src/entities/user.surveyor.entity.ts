@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { User } from './user.entity';
+import { LandPlan } from './land.plan.entity';
 
 @Entity('user_surveyor')
 export class UserSurveyor extends User {
@@ -11,4 +12,7 @@ export class UserSurveyor extends User {
 
     @Column({ type: 'varchar', nullable: true, length: 20 })
     nic?: string;
+
+    @OneToMany(type => LandPlan, plans => plans.registeredSurveyor)
+    plans?: LandPlan[];
 }

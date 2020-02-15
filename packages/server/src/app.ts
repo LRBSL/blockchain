@@ -11,7 +11,7 @@ import logger from './config/logger';
 import authenticate from './middlewares/authenticate';
 
 import indexRoute from './routes/index';
-import { down } from './utils/seed.data';
+import { down, seedData } from './utils/seed.data';
 import { database_configurations } from './config/database';
 
 const PORT = process.env.PORT || 8000;
@@ -31,20 +31,7 @@ createConnection(database_configurations).then(async (connection) => {
 
   express.use(errorHandler.errorHandler);
 
-  // await userService.getUsersCount().then(async (count) => {
-  //   if(count <= 0) {
-  //     await seedData1();
-  //   }
-  //   await seedData2();
-  // }).catch((err) => console.log(err));
-
-  // let queryRunner = connection.createQueryRunner();
-  // await queryRunner.connect().then((res) => {
-  //   console.log("##########" + res)
-  // }).catch((err) => {console.log(err)});
-  // await down(queryRunner).then((res) => {
-  //   console.log("@@@@@@@2" + res)
-  // }).catch((err) => {console.log(err)});
+  await seedData();
 
   express.listen(PORT, () => {
     logger.info(`Server running at ${PORT}`);

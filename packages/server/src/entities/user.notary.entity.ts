@@ -17,5 +17,5 @@ export class UserNotary extends User {
 
     @ManyToOne(type => UserRLR, registeredRLR => registeredRLR.registeredNotaries)
     @JoinColumn()
-    registeredRLR: UserRLR;
+    registeredRLR?: UserRLR;
 }

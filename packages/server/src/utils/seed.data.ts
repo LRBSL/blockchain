@@ -8,6 +8,8 @@ import { Land } from '../entities/land/land.entity';
 import { NicUser } from '../entities/user/nicUser.entity';
 import { LandMap } from '../entities/land/landMap.entity';
 import { Deed } from '../entities/land/deed.entity';
+import { AuthUser } from '../entities/user.auth.entity';
+import { UserNotary } from '../entities/user.notary.entity';
 
 export async function seedData1() {
     // await getRepository(BcUser).delete({});
@@ -60,7 +62,10 @@ export async function seedData2() {
 }
 
 export async function seedData() {
-
+    await getRepository("UserRLR").delete({});
+    await getRepository("UserSurveyor").delete({});
+    await getRepository("UserNotary").delete({});
+    await getRepository("AuthUser").delete({});
 }
 
 export async function down(queryRunner: QueryRunner): Promise<any> {

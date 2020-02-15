@@ -2,7 +2,7 @@ import { Column, Index, OneToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { AuthUser } from './user.auth.entity';
 
 export class User {
-    @OneToOne(type => AuthUser, { primary: true })
+    @OneToOne(type => AuthUser, { primary: true, cascade: true })
     @JoinColumn()
     user: AuthUser;
 

@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
-import { AuthUser } from './user.auth.entity';
+import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
 import { NIC } from './nic.entity';
 import { LandDeed } from './land.deed.entity';
 import { LandPlan } from './land.plan.entity';
@@ -9,7 +8,7 @@ export class Land {
     @PrimaryColumn({ type: 'varchar' })
     id: string;
 
-    @OneToOne(type => NIC)
+    @ManyToOne(type => NIC, ownerNic => ownerNic.no)
     @JoinColumn()
     ownerNic?: NIC;
 

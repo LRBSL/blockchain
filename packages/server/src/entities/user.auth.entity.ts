@@ -6,12 +6,12 @@ export class AuthUser extends DateTimeEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ type: 'varchar', unique: true })
+    @Column({ type: 'varchar', unique: true, default: "" })
     emailAddress?: string;
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', default: "" })
     password?: string;
 
-    @Column({ type: 'varchar', length: 1, nullable: true })
+    @Column({ type: 'varchar', length: 1, nullable: true, default: "" })
     type?: string;
 }
