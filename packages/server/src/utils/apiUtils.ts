@@ -5,6 +5,7 @@ import { User } from '../entities/user/user.entity';
 import IRequest from '../types/IRequest';
 import ApiResponse from './apiResponse';
 import logger from '../config/logger';
+import { AuthUser } from '../entities/user.auth.entity';
 
 const extractUserIdFromRequest = (req: IRequest) => {
     return req.user.id;
@@ -47,6 +48,11 @@ const sanitizeUser = (user: User) => {
     return userWithOutPassword;
 };
 
+function sanitizeAuthUser(authUser: AuthUser): AuthUser {
+    authUser.password = null;
+    return authUser;
+};
+
 // const restrictToStaff = (req: IRequest, res: Response, next: NextFunction) => {
 //     if (!req.user.isStaff) {
 //         ApiResponse.error(res, HttpStatusCode.FORBIDDEN);
@@ -59,6 +65,7 @@ export {
     extractUserIdFromRequest,
     extractQueryForRequest,
     sanitizeUser,
+    sanitizeAuthUser,
     extractCookieFromRequest,
     extractBCCookiesFromRequest
 };

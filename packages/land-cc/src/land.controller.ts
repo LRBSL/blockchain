@@ -97,6 +97,30 @@ export class LandController extends ConvectorController<ChaincodeTx> {
     return "mock data successfully initialized";
   }
 
+  // For initialize mock data
+  @Invokable()
+  public async createLands(@Param(yup.array<Land>()) lands: Land[]) {
+    if (!this.checkOrgPriviledges('rlr')) {
+      throw new Error('User has no priviledges to execute this action');
+    }
+    await Promise.all(lands.map(land => {
+      let x: Land = new Land({
+        id: land.id,
+        parent_land_id: land.parent_land_id,
+        extent: land.extent,
+        rlregistry: land.rlregistry,
+        current_owner_nic: land.current_owner_nic,
+        requested_new_owner_nic: land.requested_new_owner_nic,
+        boundaries: land.boundaries,
+        surveyor_vote: land.surveyor_vote,
+        notary_vote: land.notary_vote,
+        current_owner_vote: land.current_owner_nic
+      });
+      x.save();
+    }));
+    return "lands data successfully initialized";
+  }
+
   // Get land information by ID
   @Invokable()
   public async queryLand(@Param(yup.string()) id: string): Promise<Land> {

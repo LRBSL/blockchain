@@ -6,10 +6,8 @@ import { UserRLR } from './user.rlr.entity';
 
 @Entity('land_plan')
 export class LandPlan {
-    constructor(id?: string, land?: Land, deed?: LandDeed, registeredSurveyor?: UserSurveyor, registeredRLR?: UserRLR, registeredAt?: Date) {
+    constructor(id?: string, registeredSurveyor?: UserSurveyor, registeredRLR?: UserRLR, registeredAt?: Date) {
         this.id = id;
-        this.land = land;
-        this.deed = deed;
         this.registeredSurveyor = registeredSurveyor;
         this.registeredRLR = registeredRLR;
         this.registeredAt = registeredAt;
@@ -17,12 +15,6 @@ export class LandPlan {
 
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
-    @OneToOne(type => Land)
-    land?: Land;
-
-    @OneToOne(type => LandDeed)
-    deed?: LandDeed;
 
     @ManyToOne(type => UserSurveyor, registeredSurveyor => registeredSurveyor.plans)
     @JoinColumn()

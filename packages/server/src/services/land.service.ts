@@ -59,6 +59,16 @@ async function getDeedById(id: string): Promise<LandDeed | string> {
 
 async function createOrUpdateDeed(deed: LandDeed): Promise<LandDeed | string> {
     try {
+        if(deed.id == null || deed.id == undefined) {
+            let newDeed = new LandDeed();
+            newDeed.registeredNotary = deed.registeredNotary;
+            newDeed.registeredRLR = deed.registeredRLR;
+            newDeed.type = deed.type;
+            return await getRepository(LandDeed).save(newDeed).then((res: any) => {
+                return new LandDeed(res.id, res.type, res.registeredNotary as UserNotary,
+                    res.registeredRLR as UserRLR, res.registeredAt as Date);
+            });
+        }
         return await getRepository(LandDeed).save(deed).then((res: any) => {
             return new LandDeed(res.id, res.type, res.registeredNotary as UserNotary,
                 res.registeredRLR as UserRLR, res.registeredAt as Date);
@@ -84,7 +94,7 @@ async function getPlanById(id: string): Promise<LandPlan | string> {
     try {
         return await getRepository(LandPlan).findOne({ where: { id: id } }).then((res: any) => {
             if (res == null || res == undefined) throw new Error("No plan information found");
-            return new LandPlan(res.id, res.land as Land, res.deed as LandDeed, res.registeredSurveyor as UserSurveyor, 
+            return new LandPlan(res.id, res.registeredSurveyor as UserSurveyor,
                 res.registeredRLR as UserRLR, res.registeredAt as Date);
         });
     } catch (e) {
@@ -94,8 +104,17 @@ async function getPlanById(id: string): Promise<LandPlan | string> {
 
 async function createOrUpdatePlan(plan: LandPlan): Promise<LandPlan | string> {
     try {
+        if (plan.id == null || plan.id == undefined) {
+            let newPlan = new LandPlan();
+            newPlan.registeredSurveyor = plan.registeredSurveyor;
+            newPlan.registeredRLR = plan.registeredRLR;
+            return await getRepository(LandPlan).save(newPlan).then((res: any) => {
+                return new LandPlan(res.id, res.registeredSurveyor as UserSurveyor,
+                    res.registeredRLR as UserRLR, res.registeredAt as Date);
+            });
+        }
         return await getRepository(LandPlan).save(plan).then((res: any) => {
-            return new LandPlan(res.id, res.land as Land, res.deed as LandDeed, res.registeredSurveyor as UserSurveyor, 
+            return new LandPlan(res.id, res.registeredSurveyor as UserSurveyor,
                 res.registeredRLR as UserRLR, res.registeredAt as Date);
         });
     } catch (e) {

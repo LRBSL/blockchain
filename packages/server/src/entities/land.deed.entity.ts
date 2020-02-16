@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, Column, ManyToOne } from 'typeorm';
-import { Land } from './land.entity';
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ManyToOne } from 'typeorm';
 import { UserNotary } from './user.notary.entity';
 import { UserRLR } from './user.rlr.entity';
 
