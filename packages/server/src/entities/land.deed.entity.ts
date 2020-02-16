@@ -5,11 +5,16 @@ import { UserRLR } from './user.rlr.entity';
 
 @Entity('land_deed')
 export class LandDeed {
+    constructor(id?: string, type?: string, registeredNotary?: UserNotary, registeredRLR?: UserRLR, registeredAt?: Date) {
+        this.id = id;
+        this.type = type;
+        this.registeredNotary = registeredNotary;
+        this.registeredRLR = registeredRLR;
+        this.registeredAt = registeredAt;
+    }
+
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
-    @OneToOne(type => Land)
-    land?: Land;
 
     @Column({ type: 'varchar', nullable: true, length: 100 })
     type?: string;
@@ -18,7 +23,7 @@ export class LandDeed {
     registeredNotary?: UserNotary
 
     @ManyToOne(type => UserRLR, registeredRLR => registeredRLR.user)
-    registeredRLR: UserRLR
+    registeredRLR?: UserRLR
 
     @CreateDateColumn()
     registeredAt?: Date;

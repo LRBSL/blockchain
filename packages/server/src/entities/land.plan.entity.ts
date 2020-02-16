@@ -6,6 +6,15 @@ import { UserRLR } from './user.rlr.entity';
 
 @Entity('land_plan')
 export class LandPlan {
+    constructor(id?: string, land?: Land, deed?: LandDeed, registeredSurveyor?: UserSurveyor, registeredRLR?: UserRLR, registeredAt?: Date) {
+        this.id = id;
+        this.land = land;
+        this.deed = deed;
+        this.registeredSurveyor = registeredSurveyor;
+        this.registeredRLR = registeredRLR;
+        this.registeredAt = registeredAt;
+    }
+
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

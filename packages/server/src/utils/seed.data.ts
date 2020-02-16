@@ -4,12 +4,14 @@ import logger from '../config/logger';
 import { getRepository, QueryRunner } from 'typeorm';
 import { User } from '../entities/user/user.entity';
 import landService from '../services/land.service';
-import { Land } from '../entities/land/land.entity';
+import { Land } from '../entities/land.entity';
 import { NicUser } from '../entities/user/nicUser.entity';
 import { LandMap } from '../entities/land/landMap.entity';
 import { Deed } from '../entities/land/deed.entity';
 import { AuthUser } from '../entities/user.auth.entity';
 import { UserNotary } from '../entities/user.notary.entity';
+import { NIC } from '../entities/nic.entity';
+import { LandDeed } from '../entities/land.deed.entity';
 
 export async function seedData1() {
     // await getRepository(BcUser).delete({});
@@ -37,35 +39,32 @@ export async function seedData2() {
     await getRepository(LandMap).delete({});
     await getRepository(Deed).delete({});
 
-    let land1 = await landService.createLand("0000000");
-    let land2 = await landService.createLand("0000001");
-    let land3 = await landService.createLand("0000002");
-    let land4 = await landService.createLand("0000003");
-    let land5 = await landService.createLand("0000004");
-    let land6 = await landService.createLand("0000005");
 
-    let nic1 = await userService.createNicUser("123456789V", "aruna jayanath", "abc road, colombo", "male", new Date(1996, 12, 22));
-    let nic2 = await userService.createNicUser("123456788V", "pubudu jayanath", "def road, colombo", "male", new Date(1995, 12, 21));
-    let nic3 = await userService.createNicUser("123456787V", "sanduni silva", "efg road, colombo", "female", new Date(1996, 3, 13));
-    let nic4 = await userService.createNicUser("123456786V", "mahesh perera", "abc road, colombo", "male", new Date(1996, 12, 25));
-    let nic5 = await userService.createNicUser("123456785V", "janani jayanath", "efg road, colombo", "female", new Date(1996, 1, 27));
-    let nic6 = await userService.createNicUser("123456784V", "sajun silva", "abc road, colombo", "male", new Date(1996, 9, 4));
 
-    let landMap1 = await landService.createLandMap(land1.id, nic1.nic_no, "1234");
-    let landMap2 = await landService.createLandMap(land2.id, nic2.nic_no, "2345");
-    let landMap3 = await landService.createLandMap(land3.id, nic3.nic_no, "3456");
-    let landMap4 = await landService.createLandMap(land4.id, nic4.nic_no, "4567");
-    let landMap5 = await landService.createLandMap(land5.id, nic5.nic_no, "5678");
-    let landMap6 = await landService.createLandMap(land6.id, nic6.nic_no, "6789");
 
     logger.info("initial data 2 seeded");
 }
 
 export async function seedData() {
+    await getRepository("Land").delete({});
+    await getRepository("LandDeed").delete({});
     await getRepository("UserRLR").delete({});
     await getRepository("UserSurveyor").delete({});
     await getRepository("UserNotary").delete({});
+    await getRepository("NIC").delete({});
     await getRepository("AuthUser").delete({});
+
+    let au1: AuthUser | string = await userService.createAuthUser("abc@gmail.com", "abc@gmail.com", "n");
+    let nic1: NIC | string = await userService.createOrUpdateNic(new NIC("962650678V", "Ravindu Sachintha", "m", "640/57, 2nd Kurana, Negombo", new Date(2012, 10, 13)));
+    let tmpN: UserNotary | string = await userService.createOrUpdateUserNotary(new UserNotary(au1 as AuthUser, "NOT001", "Sachintha", 
+    "077-2769963", "640/57, 2nd Kurana, Colombo Road, Negombo", null, "Ravindu", "Sachintha", nic1 as NIC, null));
+    let land1: Land | string = await landService.createOrUpdateLand(new Land("0000001", nic1 as NIC, 1234, null, null))
+    let deed1: LandDeed | string = await landService.createOrUpdateDeed(new LandDeed("11111111", "gift", tmpN as UserNotary, null, null))
+    let lu1: Land = land1 as Land;
+    lu1.deed = deed1 as LandDeed;
+    let land1up: Land | string = await landService.createOrUpdateLand(lu1);
+    console.log(land1up)
+
 }
 
 export async function down(queryRunner: QueryRunner): Promise<any> {

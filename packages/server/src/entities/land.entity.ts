@@ -5,6 +5,14 @@ import { LandPlan } from './land.plan.entity';
 
 @Entity('land')
 export class Land {
+    constructor(id?: string, ownerNic?: NIC, secureKey?: number, deed?: LandDeed, plan?: LandPlan) {
+        this.id = id;
+        this.ownerNic = ownerNic;
+        this.secureKey = secureKey;
+        this.deed = deed;
+        this.plan = plan;
+    }
+
     @PrimaryColumn({ type: 'varchar' })
     id: string;
 
