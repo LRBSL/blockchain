@@ -45,6 +45,13 @@ export default {
             password: joi.string().required(),
         },
     },
+
+    getRLRUserInfo: {
+        body: {
+            id:  joi.string().required()
+        }
+    },
+
     register: {
         body: {
             email: joi.string().email().required(),

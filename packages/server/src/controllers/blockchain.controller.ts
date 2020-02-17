@@ -8,6 +8,9 @@ import { getKeyStore, getNetworkProfile } from '../utils/bcUtils';
 import { LandController } from 'land-cc';
 import { ClientFactory } from '@worldsibu/convector-core';
 import logger from '../config/logger';
+import blockchainService from '../services/blockchain.service';
+import { AuthUser } from '../entities/user.auth.entity';
+import userService from '../services/user.service';
 
 // export async function LandController_queryLand_get(req: Request, res: Response): Promise<void> {
 //     try {
@@ -129,13 +132,14 @@ export async function LandController_forkLand_post(req: Request, res: Response):
     }
 }
 
-const queryLand: IController = async (req, res) => {
+async function queryLand(userId: string, id: string) {
     try {
-        let landBackend = await bcBackendGenerator(req);
-        let land = await landBackend.queryLand(req.body.id);
-        apiResponse.result(res, land, httpStatusCodes.OK);
+        let authUser: AuthUser | string = await userService.getAuthUserById(userId);
+        let landBackend = await blockchainService.BlockchainBackendGenerator(authUser as AuthUser);
+        let land = await landBackend.queryLand(id);
+        return land;
     } catch (ex) {
-        apiResponse.error(res, httpStatusCodes.BAD_REQUEST, ex.message);
+        return ex.message;
     }
 };
 
@@ -149,14 +153,27 @@ const queryAllLands: IController = async (req, res) => {
     }
 };
 
-const getHistoryForLand: IController = async (req, res) => {
+async function getHistoryForLand(userId: string, id: string) {
     try {
-        let land = (await bcBackendGenerator(req)).getHistoryForLand(req.body.id);
-        apiResponse.result(res, land, httpStatusCodes.OK);
+        let authUser: AuthUser | string = await userService.getAuthUserById(userId);
+        let landBackend = await blockchainService.BlockchainBackendGenerator(authUser as AuthUser);
+        let history = await landBackend.getHistoryForLand(id);
+        return history;
     } catch (ex) {
-        apiResponse.error(res, httpStatusCodes.BAD_REQUEST, ex.message);
+        return ex.message;
     }
 };
+
+async function changeNotaryVote(userId: string, id: string, newOwnerNic: string) {
+    try {
+        let authUser: AuthUser | string = await userService.getAuthUserById(userId);
+        let landBackend = await blockchainService.BlockchainBackendGenerator(authUser as AuthUser);
+        let res = await landBackend.voteNotary(id, userId, newOwnerNic);
+        return res;
+    } catch (ex) {
+        return ex.message;
+    }
+}
 
 const bcBackendGenerator = async (req) => {
 
@@ -178,6 +195,7 @@ const bcBackendGenerator = async (req) => {
 export default {
     queryLand,
     queryAllLands,
-    getHistoryForLand
+    getHistoryForLand,
+    changeNotaryVote
 };
 

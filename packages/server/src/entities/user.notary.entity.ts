@@ -1,8 +1,9 @@
-import { Column, Entity, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, OneToOne, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from './user.entity';
 import { UserRLR } from './user.rlr.entity';
 import { NIC } from './nic.entity';
 import { AuthUser } from './user.auth.entity';
+import { LandDeed } from './land.deed.entity';
 
 @Entity('user_notary')
 export class UserNotary extends User {

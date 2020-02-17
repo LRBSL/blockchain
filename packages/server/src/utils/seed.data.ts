@@ -82,19 +82,19 @@ export async function seedData() {
     let surveyorUser1 = await userService.createOrUpdateUserSurveyor(surveyorUserObj1);
 
     // Deed objects
-    let landDeedObj1 = new LandDeed(null, "gift", notaryUser1 as UserNotary, rlrUser1 as UserRLR);
+    let landDeedObj1 = new LandDeed(null, "gift", (notaryUser1 as UserNotary).user.id, (rlrUser1 as UserRLR).user.id);
 
     // Deed relations
     let landDeed1 = await landService.createOrUpdateDeed(landDeedObj1);
 
     // Plan objects
-    let landPlanObj1 = new LandPlan(null, surveyorUser1 as UserSurveyor, rlrUser1 as UserRLR);
+    let landPlanObj1 = new LandPlan(null, (surveyorUser1 as UserSurveyor).user.id,(rlrUser1 as UserRLR).user.id);
 
     // Plan relations
     let landPlan1 = await landService.createOrUpdatePlan(landPlanObj1);
 
     // Land objects
-    let landObj1 = new Land("0000", nicUser1 as NIC, 1234, landDeed1 as LandDeed, landPlan1 as LandPlan);
+    let landObj1 = new Land("0000", (nicUser1 as NIC).no, 1234, (landDeed1 as LandDeed).id, (landPlan1 as LandPlan).id);
 
     // Land relations
     let land1 = await landService.createOrUpdateLand(landObj1);
@@ -103,11 +103,11 @@ export async function seedData() {
         id: (land1 as Land).id,
         parent_land_id: 'nil',
         extent: 10000,
-        rlregistry: (land1 as Land).deed.registeredRLR.user.id,
-        current_owner_nic: (land1 as Land).ownerNic.no,
+        rlregistry: (rlrUser1 as UserRLR).user.id,
+        current_owner_nic: (nicUser1 as NIC).no,
         requested_new_owner_nic: 'nil',
         boundaries: [[0, 0], [0, 100], [100, 100], [100, 0]],
-        surveyor_vote: (land1 as Land).plan.registeredSurveyor.user.id,
+        surveyor_vote: (surveyorUser1 as UserSurveyor).user.id,
         notary_vote: 'nil',
         current_owner_vote: 'nil'
     });
@@ -177,23 +177,12 @@ export async function seedData() {
 
     let rlrX = await userService.createOrUpdateUserRLR(new UserRLR(authUserAR as AuthUser, "RLR_colombo", "Colombo RLR", "011234543", "--"));
 
-    // let au1: AuthUser | string = await userService.createAuthUser("abc@gmail.com", "abc@gmail.com", "n");
-    // let nic1: NIC | string = await userService.createOrUpdateNic(new NIC("962650678V", "Ravindu Sachintha", "m", "640/57, 2nd Kurana, Negombo", new Date(2012, 10, 13)));
-    // let tmpN: UserNotary | string = await userService.createOrUpdateUserNotary(new UserNotary(au1 as AuthUser, "NOT001", "Sachintha", 
-    // "077-2769963", "640/57, 2nd Kurana, Colombo Road, Negombo", null, "Ravindu", "Sachintha", nic1 as NIC, null));
-    // let land1: Land | string = await landService.createOrUpdateLand(new Land("0000001", nic1 as NIC, 1234, null, null))
-    // let deed1: LandDeed | string = await landService.createOrUpdateDeed(new LandDeed("11111111", "gift", tmpN as UserNotary, null, null))
-    // let lu1: Land = land1 as Land;
-    // lu1.deed = deed1 as LandDeed;
-    // let land1up: Land | string = await landService.createOrUpdateLand(lu1);
-    // console.log(land1up)
-
 }
 
 async function deleteTablesOrder() {
-    await getRepository("Land").delete({});
     await getRepository("LandDeed").delete({});
     await getRepository("LandPlan").delete({});
+    await getRepository("Land").delete({});
     await getRepository("UserSurveyor").delete({});
     await getRepository("UserNotary").delete({});
     await getRepository("UserRLR").delete({});

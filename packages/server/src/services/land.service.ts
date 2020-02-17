@@ -16,7 +16,18 @@ async function getLandById(id: string): Promise<Land | string> {
     try {
         return await getRepository(Land).findOne({ where: { id: id } }).then((res: any) => {
             if (res == null || res == undefined) throw new Error("No land information found");
-            return new Land(res.id, res.ownerNic as NIC, res.secureKey, res.deed as LandDeed, res.plan as LandPlan);
+            return new Land(res.id, res.ownerNic, res.secureKey, res.deed, res.plan);
+        });
+    } catch (e) {
+        return e.message;
+    }
+}
+
+async function getLandNicKey(nicNo: string, secureKey: string): Promise<Land | string> {
+    try {
+        return await getRepository(Land).findOne({ where: { ownerNic: nicNo, secureKey: secureKey }}).then((res: any) => {
+            if (res == null || res == undefined) throw new Error("No land information found");
+            return new Land(res.id, res.ownerNic, res.secureKey, res.deed, res.plan);
         });
     } catch (e) {
         return e.message;
@@ -26,7 +37,7 @@ async function getLandById(id: string): Promise<Land | string> {
 async function createOrUpdateLand(land: Land): Promise<Land | string> {
     try {
         return await getRepository(Land).save(land).then((res: any) => {
-            return new Land(res.id, res.ownerNic as NIC, res.secureKey, res.deed as LandDeed, res.plan as LandPlan);
+            return new Land(res.id, res.ownerNic, res.secureKey, res.deed, res.plan);
         });
     } catch (e) {
         return e.message;
@@ -49,8 +60,8 @@ async function getDeedById(id: string): Promise<LandDeed | string> {
     try {
         return await getRepository(LandDeed).findOne({ where: { id: id } }).then((res: any) => {
             if (res == null || res == undefined) throw new Error("No deed information found");
-            return new LandDeed(res.id, res.type, res.registeredNotary as UserNotary,
-                res.registeredRLR as UserRLR, res.registeredAt as Date);
+            return new LandDeed(res.id, res.type, res.registeredNotary,
+                res.registeredRLR, res.registeredAt as Date);
         });
     } catch (e) {
         return e.message;
@@ -59,19 +70,19 @@ async function getDeedById(id: string): Promise<LandDeed | string> {
 
 async function createOrUpdateDeed(deed: LandDeed): Promise<LandDeed | string> {
     try {
-        if(deed.id == null || deed.id == undefined) {
+        if (deed.id == null || deed.id == undefined) {
             let newDeed = new LandDeed();
             newDeed.registeredNotary = deed.registeredNotary;
             newDeed.registeredRLR = deed.registeredRLR;
             newDeed.type = deed.type;
             return await getRepository(LandDeed).save(newDeed).then((res: any) => {
-                return new LandDeed(res.id, res.type, res.registeredNotary as UserNotary,
-                    res.registeredRLR as UserRLR, res.registeredAt as Date);
+                return new LandDeed(res.id, res.type, res.registeredNotary,
+                    res.registeredRLR, res.registeredAt as Date);
             });
         }
         return await getRepository(LandDeed).save(deed).then((res: any) => {
-            return new LandDeed(res.id, res.type, res.registeredNotary as UserNotary,
-                res.registeredRLR as UserRLR, res.registeredAt as Date);
+            return new LandDeed(res.id, res.type, res.registeredNotary,
+                res.registeredRLR, res.registeredAt as Date);
         });
     } catch (e) {
         return e.message;
@@ -94,8 +105,8 @@ async function getPlanById(id: string): Promise<LandPlan | string> {
     try {
         return await getRepository(LandPlan).findOne({ where: { id: id } }).then((res: any) => {
             if (res == null || res == undefined) throw new Error("No plan information found");
-            return new LandPlan(res.id, res.registeredSurveyor as UserSurveyor,
-                res.registeredRLR as UserRLR, res.registeredAt as Date);
+            return new LandPlan(res.id, res.registeredSurveyor,
+                res.registeredRLR, res.registeredAt as Date);
         });
     } catch (e) {
         return e.message;
@@ -109,13 +120,13 @@ async function createOrUpdatePlan(plan: LandPlan): Promise<LandPlan | string> {
             newPlan.registeredSurveyor = plan.registeredSurveyor;
             newPlan.registeredRLR = plan.registeredRLR;
             return await getRepository(LandPlan).save(newPlan).then((res: any) => {
-                return new LandPlan(res.id, res.registeredSurveyor as UserSurveyor,
-                    res.registeredRLR as UserRLR, res.registeredAt as Date);
+                return new LandPlan(res.id, res.registeredSurveyor,
+                    res.registeredRLR, res.registeredAt as Date);
             });
         }
         return await getRepository(LandPlan).save(plan).then((res: any) => {
-            return new LandPlan(res.id, res.registeredSurveyor as UserSurveyor,
-                res.registeredRLR as UserRLR, res.registeredAt as Date);
+            return new LandPlan(res.id, res.registeredSurveyor,
+                res.registeredRLR, res.registeredAt as Date);
         });
     } catch (e) {
         return e.message;
@@ -211,6 +222,7 @@ const updateDeed = async (deed: Deed) => {
 
 export default {
     getLandById,
+    getLandNicKey,
     createOrUpdateLand,
     deleteLand,
 

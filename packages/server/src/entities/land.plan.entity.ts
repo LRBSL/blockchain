@@ -1,12 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn, CreateDateColumn, ManyToOne } from 'typeorm';
-import { Land } from './land.entity';
-import { UserSurveyor } from './user.surveyor.entity';
-import { LandDeed } from './land.deed.entity';
-import { UserRLR } from './user.rlr.entity';
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column } from 'typeorm';
 
 @Entity('land_plan')
 export class LandPlan {
-    constructor(id?: string, registeredSurveyor?: UserSurveyor, registeredRLR?: UserRLR, registeredAt?: Date) {
+    constructor(id?: string, registeredSurveyor?: string, registeredRLR?: string, registeredAt?: Date) {
         this.id = id;
         this.registeredSurveyor = registeredSurveyor;
         this.registeredRLR = registeredRLR;
@@ -16,12 +12,11 @@ export class LandPlan {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(type => UserSurveyor, registeredSurveyor => registeredSurveyor.plans)
-    @JoinColumn()
-    registeredSurveyor?: UserSurveyor
+    @Column({ type: 'varchar', nullable: true })
+    registeredSurveyor?: string;
 
-    @ManyToOne(type => UserRLR, registeredRLR => registeredRLR.user)
-    registeredRLR?: UserRLR
+    @Column({ type: 'varchar', nullable: true })
+    registeredRLR?: string;
 
     @CreateDateColumn()
     registeredAt?: Date;

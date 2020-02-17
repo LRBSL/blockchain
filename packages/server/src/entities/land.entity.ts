@@ -5,7 +5,7 @@ import { LandPlan } from './land.plan.entity';
 
 @Entity('land')
 export class Land {
-    constructor(id?: string, ownerNic?: NIC, secureKey?: number, deed?: LandDeed, plan?: LandPlan) {
+    constructor(id?: string, ownerNic?: string, secureKey?: number, deed?: string, plan?: string) {
         this.id = id;
         this.ownerNic = ownerNic;
         this.secureKey = secureKey;
@@ -16,18 +16,15 @@ export class Land {
     @PrimaryColumn({ type: 'varchar' })
     id: string;
 
-    @ManyToOne(type => NIC, ownerNic => ownerNic.no)
-    @JoinColumn()
-    ownerNic?: NIC;
-
     @Column({ type: 'int' })
     secureKey?: number;
 
-    @OneToOne(type => LandDeed)
-    @JoinColumn()
-    deed?: LandDeed;
+    @Column({ type: 'varchar' })
+    ownerNic?: string;
 
-    @OneToOne(type => LandPlan)
-    @JoinColumn()
-    plan?: LandPlan;
+    @Column({ type: 'varchar' })
+    deed?: string;
+
+    @Column({ type: 'varchar' })
+    plan?: string;
 }

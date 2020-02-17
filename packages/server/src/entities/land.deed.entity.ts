@@ -1,10 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ManyToOne } from 'typeorm';
-import { UserNotary } from './user.notary.entity';
-import { UserRLR } from './user.rlr.entity';
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column } from 'typeorm';
 
 @Entity('land_deed')
 export class LandDeed {
-    constructor(id?: string, type?: string, registeredNotary?: UserNotary, registeredRLR?: UserRLR, registeredAt?: Date) {
+    constructor(id?: string, type?: string, registeredNotary?: string, registeredRLR?: string, registeredAt?: Date) {
         this.id = id;
         this.type = type;
         this.registeredNotary = registeredNotary;
@@ -18,11 +16,11 @@ export class LandDeed {
     @Column({ type: 'varchar', nullable: true, length: 100 })
     type?: string;
 
-    @ManyToOne(type => UserNotary, registeredNotary => registeredNotary.user)
-    registeredNotary?: UserNotary
+    @Column({ type: 'varchar', nullable: true })
+    registeredNotary?: string;
 
-    @ManyToOne(type => UserRLR, registeredRLR => registeredRLR.user)
-    registeredRLR?: UserRLR
+    @Column({ type: 'varchar', nullable: true })
+    registeredRLR?: string
 
     @CreateDateColumn()
     registeredAt?: Date;

@@ -26,7 +26,7 @@ export default async (req: IRequest, res: express.Response, next: express.NextFu
         if (authorizationHeader) {
             const decoded = await verifyCookie(authorizationHeader);
             if (decoded) {
-                const user = await userService.getUserById(decoded.data[Constants.Cookie.KEY_USER_ID]);
+                const user = await userService.getAuthUserById(decoded.data[Constants.Cookie.KEY_USER_ID]);
                 if (user) {
                     // @ts-ignore
                     req.user = user;

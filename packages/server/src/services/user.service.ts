@@ -96,6 +96,20 @@ async function getUserNotary(authUser: AuthUser): Promise<UserNotary | string> {
     }
 }
 
+async function getUserNotaryById(id: string): Promise<UserNotary | string> {
+    try {
+        let authUser: AuthUser | string = await getAuthUserById(id);
+        if (authUser instanceof AuthUser) return await getRepository(UserNotary).findOne({ where: { user: authUser } }).then((res: any) => {
+            if (res == null || res == undefined) throw new Error("No notary user found");
+            return new UserNotary(res.user as AuthUser, res.registeredId, res.publicName, res.contactNo, res.postalAddress,
+                res.registeredAt as Date, res.firstName, res.lastName, res.nic as NIC, res.registeredRLR as UserRLR);
+        });
+        else throw new Error("No Notary user information found");
+    } catch (e) {
+        return e.message;
+    }
+}
+
 async function createOrUpdateUserNotary(userNotary: UserNotary): Promise<UserNotary | string> {
     try {
         return await getRepository(UserNotary).save(userNotary).then((res: any) => {
@@ -126,6 +140,20 @@ async function getUserSurveyor(authUser: AuthUser): Promise<UserSurveyor | strin
             return new UserSurveyor(res.user as AuthUser, res.registeredId, res.publicName, res.contactNo, res.postalAddress,
                 res.registeredAt as Date, res.firstName, res.lastName, res.nic as NIC, res.plans as LandPlan[]);
         });
+    } catch (e) {
+        return e.message;
+    }
+}
+
+async function getUserSurveyorById(id: string): Promise<UserSurveyor | string> {
+    try {
+        let authUser: AuthUser | string = await getAuthUserById(id);
+        if (authUser instanceof AuthUser) return await getRepository(UserSurveyor).findOne({ where: { user: authUser } }).then((res: any) => {
+            if (res == null || res == undefined) throw new Error("No surveyor user found");
+            return new UserSurveyor(res.user as AuthUser, res.registeredId, res.publicName, res.contactNo, res.postalAddress,
+                res.registeredAt as Date, res.firstName, res.lastName, res.nic as NIC, res.plans as LandPlan[]);
+        });
+        else throw new Error("No Surveyor user information found");
     } catch (e) {
         return e.message;
     }
@@ -378,10 +406,12 @@ export default {
     deleteAuthUserById,
 
     getUserNotary,
+    getUserNotaryById,
     createOrUpdateUserNotary,
     deleteUserNotary,
 
     getUserSurveyor,
+    getUserSurveyorById,
     createOrUpdateUserSurveyor,
     deleteUserSurveyor,
 
