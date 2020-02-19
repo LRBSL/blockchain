@@ -12,24 +12,6 @@ import { UserNotary } from '../entities/user.notary.entity';
 import { LandPlan } from '../entities/land.plan.entity';
 import { UserSurveyor } from '../entities/user.surveyor.entity';
 
-const getLandIdFromLandMap: IController = async (req, res) => {
-    const landMap = await landService.getLandBySecureKeyNIC(req.body.nic, req.body.key);
-    if (landMap) {
-        apiResponse.result(res, landMap.id, httpStatusCodes.OK);
-    } else {
-        apiResponse.error(res, httpStatusCodes.NOT_FOUND, "No resource found");
-    }
-};
-
-const getDeedByLandId: IController = async (req, res) => {
-    const deed = await landService.getDeedByLandId(req.body.landId);
-    if (deed) {
-        apiResponse.result(res, deed, httpStatusCodes.OK);
-    } else {
-        apiResponse.error(res, httpStatusCodes.NOT_FOUND, "No resource found");
-    }
-};
-
 async function ownerVerification(req, res) {
     try {
         let landInfo: Land | string = await landService.getLandNicKey(req.body.nic, req.body.key);
@@ -102,7 +84,5 @@ export default {
     ownerVerification,
     getHistoryForLand,
     buyerVerification,
-    changeNotaryVote,
-    getLandIdFromLandMap,
-    getDeedByLandId
+    changeNotaryVote
 };

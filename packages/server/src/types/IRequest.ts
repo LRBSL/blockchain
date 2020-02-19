@@ -1,7 +1,7 @@
 import { Request } from 'express';
-import { User } from '../entities/user/user.entity';
+import { AuthUser } from '../entities/user.auth.entity';
 
 export default interface IRequest extends Request {
-    user: User;
+    user: AuthUser;
     dashboard: boolean;
 }

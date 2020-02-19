@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as HttpStatusCode from 'http-status-codes';
 
-import { User } from '../entities/user/user.entity';
+import { User } from '../entities/user.entity';
 import IRequest from '../types/IRequest';
 import ApiResponse from './apiResponse';
 import logger from '../config/logger';
@@ -43,28 +43,19 @@ const extractBCCookiesFromRequest = (cookie: string) => {
     return result;
 };
 
-const sanitizeUser = (user: User) => {
-    const { password, ...userWithOutPassword } = user;
-    return userWithOutPassword;
-};
+// const sanitizeUser = (user: User) => {
+//     const { password, ...userWithOutPassword } = user;
+//     return userWithOutPassword;
+// };
 
 function sanitizeAuthUser(authUser: AuthUser): AuthUser {
     authUser.password = null;
     return authUser;
 };
 
-// const restrictToStaff = (req: IRequest, res: Response, next: NextFunction) => {
-//     if (!req.user.isStaff) {
-//         ApiResponse.error(res, HttpStatusCode.FORBIDDEN);
-//         return;
-//     }
-//     next();
-// };
-
 export {
     extractUserIdFromRequest,
     extractQueryForRequest,
-    sanitizeUser,
     sanitizeAuthUser,
     extractCookieFromRequest,
     extractBCCookiesFromRequest

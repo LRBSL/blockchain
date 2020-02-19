@@ -1,4 +1,3 @@
-import { security_config } from '../config';
 import { createBCAdapter, initServerIdentityForBC, checkCryptographicMaterialsForBC } from '../convector';
 import { ClientFactory } from '@worldsibu/convector-core';
 import * as Fabric_Client from 'fabric-client';
@@ -12,8 +11,6 @@ import constants from '../constants';
 import apiResponse from '../utils/apiResponse';
 import locale from '../constants/locale';
 import logger from '../config/logger';
-import bcUserService from '../services/bcUser.service';
-import { extractBCCookiesFromRequest } from '../utils/apiUtils';
 import { getKeyStore, getNetworkProfile } from '../utils/bcUtils';
 import { UserRLR } from '../entities/user.rlr.entity';
 import { AuthUser } from '../entities/user.auth.entity';
@@ -107,7 +104,7 @@ async function registerRLR(req: any, res: any) {
             }).catch((err) => {
                 if (err.toString().indexOf('Authorization') > -1) {
                     let errmsg = 'Authorization failures may be caused by having admin credentials from a previous CA instance.\n' +
-                        'Try again after deleting the contents of the store directory ' + security_config.keyStore;
+                        'Try again after deleting the contents of the store directory ' + keyStore;
                     apiResponse.error(res, httpStatusCodes.INTERNAL_SERVER_ERROR, errmsg);
                     return;
                 }
@@ -209,7 +206,7 @@ async function registerNotary(req: any, res: any) {
             }).catch((err) => {
                 if (err.toString().indexOf('Authorization') > -1) {
                     let errmsg = 'Authorization failures may be caused by having admin credentials from a previous CA instance.\n' +
-                        'Try again after deleting the contents of the store directory ' + security_config.keyStore;
+                        'Try again after deleting the contents of the store directory ' + keyStore;
                     apiResponse.error(res, httpStatusCodes.INTERNAL_SERVER_ERROR, errmsg);
                     return;
                 }
@@ -309,7 +306,7 @@ async function registerSurveyor(req: any, res: any) {
             }).catch((err) => {
                 if (err.toString().indexOf('Authorization') > -1) {
                     let errmsg = 'Authorization failures may be caused by having admin credentials from a previous CA instance.\n' +
-                        'Try again after deleting the contents of the store directory ' + security_config.keyStore;
+                        'Try again after deleting the contents of the store directory ' + keyStore;
                     apiResponse.error(res, httpStatusCodes.INTERNAL_SERVER_ERROR, errmsg);
                     return;
                 }
@@ -378,28 +375,11 @@ const generateUserCookie = async (userId: string) => {
     };
 };
 
-const generateBlockchainCookie = (key: string, value: string) => {
-    return {
-        key: key,
-        value: value,
-    };
-};
-
-const getUserByNic: IController = async (req, res) => {
-    const user = await userService.getNicUserByNic(req.body.nic);
-    if (user) {
-        apiResponse.result(res, user, httpStatusCodes.OK);
-    } else {
-        apiResponse.error(res, httpStatusCodes.NOT_FOUND, locale.INVALID_CREDENTIALS);
-    }
-};
-
 
 export default {
     registerRLR,
     registerNotary,
     registerSurveyor,
     login,
-    getRLRUserInfo,
-    getUserByNic
+    getRLRUserInfo
 };
